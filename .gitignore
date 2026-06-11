@@ -1,0 +1,56 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDEs / VS Code
+.vs/
+.vscode/
+.idea/
+*.swp
+
+# Build artifacts
+dist/
+build/
+out/
+
+# Build output folders
+Debug/
+Release/
+
+# .NET artifacts
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# NuGet packages
+*.nupkg
+packages/
+*.snupkg
+
+# Dotnet tools
+.dotnet/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Secrets / configs
+appsettings.*.json
+secrets.json
+
+# Environment files
+.env
+
+# Dependencies
+node_modules/
+vendor/

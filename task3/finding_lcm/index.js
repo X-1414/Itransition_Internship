@@ -17,17 +17,25 @@ function lcm(x,y){
 }
 
 app.get(["/", "/khv_uzb14_gmail_com"], (req, res) => {
-    const x = BigInt(req.query.x);
-    const y = BigInt(req.query.y);
+    const xRaw = req.query.x;
+    const yRaw = req.query.y;
+
+    if (!xRaw || !yRaw) {
+        return res.send("NaN");
+    }
+
+    let x, y;
+    try {
+        x = BigInt(xRaw);   
+        y = BigInt(yRaw);
+    }    catch {
+        return res.send("NaN");
+    }
 
     if (x <= 0n || y <= 0n) {
         return res.send("NaN");
     }
 
-    if (!isNatural(x) || !isNatural(y)) {
-        return res.send("NaN");
-    }
-    
     const result = lcm(x, y);
     res.type("text/plain").send(result.toString());
 });

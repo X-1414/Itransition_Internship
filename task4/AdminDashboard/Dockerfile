@@ -1,21 +1,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# copy csproj WITH correct path
-COPY task4/AdminDashboard/*.csproj ./AdminDashboard/
-
-WORKDIR /src/AdminDashboard
-
+COPY *.csproj ./
 RUN dotnet restore
 
-# copy everything
-COPY task4/AdminDashboard/ ./
-
+COPY . ./
 RUN dotnet publish -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
+COPY --from=build /app/publish ./
 
-COPY --from=build /app/publish .
+EXPOSE 10000
 
 ENTRYPOINT ["dotnet", "AdminDashboard.dll"]

@@ -1,0 +1,51 @@
+@model LoginViewModel?
+@{ ViewData["Title"]="Sign In"; Layout="_LayoutAuth";}
+
+<div class="auth-card">
+    <div class="auth-brand">THE APP</div>
+    <p class="auth-subtitle">Start Your Journey</p>
+    <h1 class="auth-title">Sign In to The App</h1>
+
+    @if (TempData["Success"]!=null){
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"]!=null){
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form asp-action="Login" method="post" novalidate>
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="alert alert-danger small py-2" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Email" class="form-control" id="email" placeholder="Email" autocomplete="email"/>
+            <label for="email"><i class="bi bi-envelope me-1"></i>Email</label>
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+
+        <div class="form-floating mb-3 position-relative">
+            <input asp-for="Password" type="password" class="form-control" id="password" placeholder="Password" autocomplete="current-password"/>
+            <label for="password"><i class="bi bi-lock me-1"></i>Password</label>
+            <button type="button" class="btn-toggle-pw" onclick="togglePassword('password', this)" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button>
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="RememberMe" class="form-check-input" id="rememberMe"/>
+            <label class="form-check-label" for="rememberMe">Remember me</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Sign In</button> 
+    </form>
+
+    <hr class="my-3"/>
+    <div class="d-flex justify-content-between small">
+        <a asp-action="Register">Don't have an account? Sign up</a>
+    </div>
+</div>

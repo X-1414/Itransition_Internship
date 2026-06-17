@@ -29,10 +29,11 @@ Release/
 *.pdb
 *.cache
 
-# NuGet packages
+# packages
 *.nupkg
 packages/
 *.snupkg
+*.deb
 
 # Dotnet tools
 .dotnet/

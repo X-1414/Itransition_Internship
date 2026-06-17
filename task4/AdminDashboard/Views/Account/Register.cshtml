@@ -1,0 +1,46 @@
+@model RegisterViewModel?
+@{ ViewData["Title"]="Register"; Layout="_LayoutAuth";}
+
+<div class="auth-card">
+    <div class="auth-brand">THE APP</div>
+    <p class="auth-subtitle">Create your account</p>
+    <h1 class="auth-title">Register</h1>
+
+    @if (TempData["Error"]!=null){
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form asp-action="Register" method="post" novalidate>
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="alert alert-danger small py-2" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Name" class="form-control" id="name" placeholder="Full name" autocomplete="name"/>
+            <label for="name"><i class="bi bi-person me-1"></i>Full name</label>
+            <span asp-validation-for="Name" class="text-danger small"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Email" class="form-control" id="rEmail" placeholder="Email" autocomplete="email"/>
+            <label for="rEmail"><i class="bi bi-envelope me-1"></i>Email</label>
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+
+        <div class="form-floating mb-3 position-relative">
+            <input asp-for="Password" type="password" class="form-control" id="rPassword" placeholder="Password" autocomplete="new-password"/>
+            <label for="rPassword"><i class="bi bi-lock me-1"></i>Password</label>
+            <button type="button" class="btn-toggle-pw" onclick="togglePassword('rPassword', this)" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button>
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Create Account</button> 
+    </form>
+
+    <hr class="my-3"/>
+    <div class="small">
+        <a asp-action="Login">Already have an account? Sign in</a>
+    </div>
+</div>

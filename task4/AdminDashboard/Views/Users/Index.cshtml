@@ -1,0 +1,256 @@
+<!-- table, toolbar sparklines -->
+
+@model List<UserViewModel>
+@using AdminDashboard.Services
+@{ 
+    ViewData["Title"] = "Users";
+    string? filterStatus = ViewData["FilterStatus"] as string ?? "";
+    string? filterName = ViewData["FilterName"] as string ?? "";
+    string? filterEmail = ViewData["FilterEmail"] as string ?? "";
+    bool hasActiveFilter = !string.IsNullOrWhiteSpace(filterStatus) || !string.IsNullOrWhiteSpace(filterName) || !string.IsNullOrWhiteSpace(filterEmail);
+}
+
+<div class="container-fluid px-4 py-4">
+
+    @* Status Messages *@
+
+    @if (TempData["Success"]!=null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Warning"]!=null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Warning"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"]!=null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @* Filter bar *@
+    <form id="filterForm" method="get" asp-action="Index" class="filter-bar d-flex flex-wrap align-items-end gap-2">
+        <div>
+            <div class="form-label mb-1">Status</div>
+            <select name="status" class="form-select form-select-sm" style="width:150px;" onchange="this.form.submit()">
+                <option value="" selected="@(filterStatus=="")">All statuses</option>
+                <option value="Unverified" selected="@(filterStatus == "Unverified")">Unverified</option>
+                <option value="Active" selected="@(filterStatus=="Active")">Active</option>
+                <option value="Blocked" selected="@(filterStatus=="Blocked")">Blocked</option>
+            </select>
+        </div>
+        <div>
+            <div class="form-lable mb-1">Email</div>
+            <input type="text" name="email" value="@filterEmail" class="form-control form-control-sm" style="width:200px"; placeholder="Search by email"/>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" title="Apply filter">
+                <i class="bi bi-funnel me-1"></i>Filter
+            </button>
+            @if (hasActiveFilter){
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip" title="Clear filter">
+                    <i class="bi bi-x-circle me-1"></i>Clear
+                </a>
+            }
+        </div>
+    </form>
+
+
+    <form id="userForm" method="post">
+        @Html.AntiForgeryToken()
+
+        @* Toolbar *@
+        <div class="toolbar mb-0 d-flex align-items-center gap-2 flex-wrap" id="toolbar">
+                <button type="submit" formaction="/Users/Block" class="btn btn-outline-secondary btn-sm toolbar-btn" id="btnBlock" data-bs-toggle="tooltip" title="Block selected users" disabled>
+                    <i class="bi bi-lock"></i>Block
+                </button>
+                <button type="submit" formaction="/Users/Unblock" class="btn btn-outline-secondary btn-sm toolbar-btn icon-only" id="btnUnblock" data-bs-toggle="tooltip" title="Unblock selected users" disabled>
+                    <i class="bi bi-unlock"></i>
+                </button>
+                <button type="submit" formaction="/Users/Delete" class="btn btn-outline-danger btn-sm toolbar-btn icon-only" id="btnDelete" data-bs-toggle="tooltip" title="Delete selected users" disabled onclick="return confirmDeletion()">
+                    <i class="bi bi-trash"></i>
+                </button>
+
+                <div class="toolbar-separator"></div>
+                
+                <button type="submit" formaction="/Users/DeleteUnverified" class="btn btn-outline-secondary btn-sm toolbar-btn icon-only" id="btnDeleteUnverified" data-bs-toggle="tooltip" title="Delete unverified users" onclick="return confirmDeleteUnverified()">
+                    <i class="bi bi-person-x"></i>
+                </button>
+                
+                <div class="ms-auto text-muted small d-flex align-items-center" id="selectionCount">
+                    @Model.Count user(s) total
+                </div>
+        </div>
+
+
+        @* Table *@
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle mb-0 users-table">
+                <thead class="table-light">
+                    <tr>
+                        <th class="col-check" scope="col">
+                            <input type="checkbox" id="selectAll" class="form-check-input" title="Select all" data-bs-toggle="tooltip"/>
+                        </th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col" class="col-status">Status</th>
+                        <th scope="col" class="col-login">Last Seen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var user in Model)
+                    {
+                        string? statusClass = user.Status switch
+                        {
+                            UserStatus.Active => "badge-active",
+                            UserStatus.Blocked => "badge-blocked",
+                            _ => "bi-question-circle"
+                        };
+                        string? statusIcon = user.Status switch
+                        {
+                            UserStatus.Active => "badge-check-circle",
+                            UserStatus.Blocked => "badge-slash-circle",
+                            _ => "bi-hourglass-split"
+                        };
+                        string lastSeenRelative = user.LastLoginAt.HasValue ? TimeFormatHelper.ToRelativeTime(user.LastLoginAt.Value) : "Never";
+                        string lastSeenExact = user.LastLoginAt.HasValue ? user.LastLoginAt.Value.ToString("yyyy-MM-dd HH:mm:ss") + " UTC" : "Never logged in";
+                        string rowClass = user.Status == UserStatus.Blocked ? "row-blocked" : "";
+
+                        <tr class="@rowClass" data-user-id="@user.Id" data-status="@user.Status">
+                            <td class="col-check">
+                                <input type="checkbox" name="selectedIds" value="@user.Id" class="form-check-input row-check" data-status="@user.Status"/> 
+                            </td>
+
+                            <td>
+                                <div class="user-name @(user.Status==UserStatus.Blocked ? "text-decoration-line-through text-muted" : "")">@user.Name</div>
+                                <div class="user-sub text-muted small">Joined @user.RegisteredAt.ToString("MMM yyyy")</div>
+                            </td>
+
+                            <td class="@(user.Status==UserStatus.Blocked ? "text-muted" : "")">@user.Email</td>
+
+                            <td class="col-status">
+                                <span class="status-badge @statusClass" data-bs-toggle="tooltip" title="@user.Status">
+                                    <i class="bi @statusIcon me-1"></i>@user.Status
+                                </span>
+                            </td>
+
+                            <td class="col-login">
+                                <div class="last-seen-text" data-bs-toggle="tooltip" title="@lastSeenExact">@lastSeenRelative</div> 
+                                @if (user.SparklineValues.Any(v=>v>0))
+                                {
+                                    <svg class="sparkline" width="60" height="20" viewBox="0 0 60 20" aria-label="Session duration, last 7 logins (minutes, capped at 60)">
+                                        @{
+                                            List<int>? vals = user.SparklineValues;
+                                            List<int>? last7 = vals.Skip(Math.Max(0, vals.Count-7)).ToList();
+                                            int barW = 6;
+                                            int gap = 3;
+                                            double capMinutes=60.0;
+                                            for (int i=0; i<last7.Count; i++){
+                                                var capped = Math.Min(last7[i], capMinutes);
+                                                int h = (int)Math.Max(2, capped * 18.0 / capMinutes);
+                                                int x = i * (barW + gap);
+                                                var y = 20 -h;
+                                                bool isLast = i == last7.Count - 1;
+                                                <rect x="@x" y="@y" width="@barW" height="@h" rx="1" class="spark-bar @(isLast ? "spark-bar-today" : "")">
+                                                    <title>@last7[i] minute(s)</title>
+                                                </rect>
+                                            }
+                                        }
+                                    </svg>
+                                }
+                            </td>
+                        </tr>
+                    }
+
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-5">
+                                <i class="bi bi-people display-6 d-block mb-2"></i>
+                                No users found@(hasActiveFilter ? " matching this filter." : ".")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+@section Scripts 
+{
+    <script>
+        (function() 
+        {
+            //select/disselect all
+            const selectAll = document.getElementById('selectAll');
+            const rowChecks = document.querySelectorAll('.row-check');
+            const btnBlock = document.getElementById('btnBlock');
+            const btnUnblock = document.getElementById('btnUnblock');
+            const btnDelete = document.getElementById('btnDelete');
+            const selCount = document.getElementById('selectionCount');
+            const total = rowChecks.length;
+
+            function updateToolbar()
+            {
+                const checked = Array.from(document.querySelectorAll('.row-check:checked'));
+                const n = checked.length;
+                const hasSelection = n>0;
+                const hasBlockedSelected = checked.some(cb=>cb.dataset.status==='Blocked');
+
+                btnBlock.disabled = !hasSelection;
+                btnUnblock.disabled = !hasBlockedSelected;
+                btnDelete.disabled = !hasSelection;
+
+                if (n===0)
+                    selCount.textContent = `${total} user(s) total`;
+                else
+                    selCount.textContent = `${n} of ${total} selected`;
+
+                selectAll.indeterminate = n>0 && n<total;
+                selectAll.checked = n === total && total>0;
+            }
+
+            selectAll.addEventListener('change', function()
+            {
+                rowChecks.forEach(cb=>cb.checked=this.checked);
+                updateToolbar();
+            });
+
+            rowChecks.forEach(cb=>cb.addEventListener('change', updateToolbar));
+
+            document.querySelectorAll('.users-table tbody tr').forEach(row=>{
+                row.addEventListener('click', function (e){
+                    if (e.target.type === 'checkbox') return;
+                    const cb = row.querySelector('.row-check');
+                    if (cb) { cb.checked=!cb.checked; updateToolbar();}
+                });
+            });
+
+            updateToolbar();
+
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el=>{
+                new bootstrap.Tooltip(el, {trigger: 'hover'});
+            });
+        })();
+
+        function confirmDeletion(){
+            const n = document.querySelectorAll('.row-check:checked').length;
+            return n>0 && confirm (`Delete ${n} user(s)? This cannot be undone.`);
+        }
+
+        function confirmDeleteUnverified(){
+            return confirm(`Delete all unverified users? This cannot be undone.`);
+        }
+    
+    </script>
+}
+

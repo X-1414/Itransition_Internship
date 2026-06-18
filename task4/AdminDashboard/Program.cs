@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using AdminDashboard.Models;
 using AdminDashboard.Services;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.CodeAnalysis.Options;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +15,7 @@ if (!string.IsNullOrEmpty(port))
 
 // postgresql
 builder.Services.AddDbContext<AppDbContext>(options=>options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDataProtection().PersistKeysToDbContext<AppDbContext>().SetApplicationName("AdminDashboard");
 
 //services
 builder.Services.AddScoped<UserStatusFilter>();

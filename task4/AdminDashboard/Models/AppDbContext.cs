@@ -1,15 +1,16 @@
 // EF config, unique indexing 
-
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace AdminDashboard.Models;
 
-public class AppDbContext : DbContext
+public class AppDbContext : DbContext, IDataProtectionKeyContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options):base(options){}
 
     public DbSet<User> Users { get; set; } = null!;
     
+    public DbSet<Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey> DataProtectionKeys { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

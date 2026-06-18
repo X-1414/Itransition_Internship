@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using AdminDashboard.Models;
 using AdminDashboard.Services;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure.Internal;
 
 namespace AdminDashboard.Controllers;
 public class AccountController : Controller
@@ -27,7 +26,7 @@ public class AccountController : Controller
         if (reason == "deleted")
             TempData["Error"] = "Your account has been deleted. Please register again.";
         else if (reason == "blocked")
-            TempData["Error"] = "Your account has been blocked. Please contact an administrator.";
+            TempData["Error"] = "Your account has been blocked. Please contact an administrator or sign up with a new account.";
 
         var model = new LoginViewModel();
         if(!string.IsNullOrWhiteSpace(prefillEmail))
@@ -104,9 +103,10 @@ public class AccountController : Controller
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
         }
-        catch (DbUpdateException)
+        // PostgreSQL error 23505 - unique violation - raised by ix-users-email-unique
+        catch (DbUpdateException dbEx) when (dbEx.InnerException is Npgsql.PostgresException pgEx && pgEx.SqlState == "23505")
         {
-            ModelState.AddModelError("Email", "This email address is already registered.");
+            ModelState.AddModelError("Email", "This email address is already registered. (Rejected by the database's unique index.)");
             return View(model);
         }
 

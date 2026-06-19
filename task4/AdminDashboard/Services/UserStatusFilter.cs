@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using AdminDashboard.Models;
+using AdminDashboard.Controllers;
 
 namespace AdminDashboard.Services;
 
@@ -19,7 +20,6 @@ public class UserStatusFilter : IAsyncActionFilter
     {
         var descriptor = context.ActionDescriptor as Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor;
         var controllerName = descriptor?.ControllerName;
-        var actionName = descriptor?.ActionName;
 
         if (controllerName == "Account")
         {
@@ -43,9 +43,11 @@ public class UserStatusFilter : IAsyncActionFilter
             context.Result = new RedirectToActionResult("Login", "Account", new{reason = user == null ? "deleted" : "blocked" });
             return;
         }
+
         if (user.LastLoginAt == null || (DateTime.UtcNow - user.LastLoginAt.Value).TotalSeconds > 60)
         {
             user.LastLoginAt = DateTime.UtcNow;
+            AccountController.UpsertCurrentSessionDuration(user);
             await _db.SaveChangesAsync();
         }
         

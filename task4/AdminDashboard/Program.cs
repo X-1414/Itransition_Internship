@@ -45,7 +45,20 @@ app.UseForwardedHeaders();
 using (var scope= app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    try {
+        db.Database.Migrate();
+    }
+    catch (Npgsql.PostgresException ex) when (ex.SqlState=="42P07"){
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning("Migration failed because tables already exist outside migration history " + "({Message}). Dropping known tables and retrying once.", ex.Message);
+        
+        db.Database.ExecuteSqlRaw(@"
+            DROP TABLE IF EXISTS users CASCADE;
+            DROP TABLE IF EXISTS ""DataProtectionKeys"" CASCADE;
+            DROP TABLE IF EXISTS ""__EFMigrationsHistory"" CASCADE;
+        ");
+        db.Database.Migrate();
+    }
 }
 
 // Configure the HTTP request pipeline.

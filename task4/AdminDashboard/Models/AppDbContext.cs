@@ -6,11 +6,24 @@ namespace AdminDashboard.Models;
 
 public class AppDbContext : DbContext, IDataProtectionKeyContext
 {
+    public readonly IConfiguration? _configuration;
     public AppDbContext(DbContextOptions<AppDbContext> options):base(options){}
+    public AppDbContext(DbContextOptions<AppDbContext> options, IConfiguration configuration) : base(options){
+        _configuration = configuration;
+    }
 
     public DbSet<User> Users { get; set; } = null!;
     
     public DbSet<Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey> DataProtectionKeys { get; set; } = null!;
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder){
+        if (!optionsBuilder.IsConfigured){
+            var connectionString = _configuration?.GetConnectionString("DefaultConnection") ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+            if (!string.IsNullOrEmpty(connectionString)) optionsBuilder.UseNpgsql(connectionString);
+        }
+        base.OnConfiguring(optionsBuilder);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

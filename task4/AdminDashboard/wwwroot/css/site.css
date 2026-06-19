@@ -224,20 +224,6 @@ body {
     color: var(--status-unverified-color);
 }
 
-/* sparklines */
-.sparkline {
-    display: block;
-    margin-top: 4px;
-}
-
-.spark-bar {
-    fill: #9ec5fe;
-}
-
-.spark-bar-today {
-    fill: #0d6efd;
-}
-
 .last-seen-text {
     white-space: nowrap;
     font-size: 0.82rem;

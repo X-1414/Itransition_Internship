@@ -41,9 +41,7 @@ public class AppDbContext : DbContext, IDataProtectionKeyContext
             entity.Property(u=>u.RegisteredAt).HasColumnName("registered_at");
             entity.Property(u=>u.LastLoginAt).HasColumnName("last_login_at");
             entity.Property(u=>u.EmailVerificationToken).HasColumnName("email_verification_token");
-            entity.Property(u=>u.ActivityLog).HasColumnName("activity_log");
             entity.Property(u=>u.WasEverVerified).HasColumnName("was_ever_verified").HasDefaultValue(false);
-            entity.Property(u=>u.CurrentSessionStartUnix).HasColumnName("current_session_start_unix");
         });
     }
 }

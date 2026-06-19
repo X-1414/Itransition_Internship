@@ -1,4 +1,4 @@
-<!-- table, toolbar sparklines -->
+<!-- table, toolbar -->
 
 @model List<UserViewModel>
 @using AdminDashboard.Services
@@ -144,28 +144,6 @@
 
                             <td class="col-login">
                                 <div class="last-seen-text" data-bs-toggle="tooltip" title="@lastSeenExact">@lastSeenRelative</div> 
-                                @if (user.SparklineValues.Any(v=>v>0))
-                                {
-                                    <svg class="sparkline" width="60" height="20" viewBox="0 0 60 20" aria-label="Session duration, last 7 logins (minutes, capped at 60)">
-                                        @{
-                                            List<int>? vals = user.SparklineValues;
-                                            List<int>? last7 = vals.Skip(Math.Max(0, vals.Count-7)).ToList();
-                                            int barW = 6;
-                                            int gap = 3;
-                                            double capMinutes=60.0;
-                                            for (int i=0; i<last7.Count; i++){
-                                                var capped = Math.Min(last7[i], capMinutes);
-                                                int h = (int)Math.Max(2, capped * 18.0 / capMinutes);
-                                                int x = i * (barW + gap);
-                                                var y = 20 -h;
-                                                bool isLast = i == last7.Count - 1;
-                                                <rect x="@x" y="@y" width="@barW" height="@h" rx="1" class="spark-bar @(isLast ? "spark-bar-today" : "")">
-                                                    <title>@last7[i] minute(s)</title>
-                                                </rect>
-                                            }
-                                        }
-                                    </svg>
-                                }
                             </td>
                         </tr>
                     }

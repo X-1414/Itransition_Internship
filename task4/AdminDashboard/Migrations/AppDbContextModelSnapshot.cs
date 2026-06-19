@@ -30,14 +30,6 @@ namespace AdminDashboard.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ActivityLog")
-                        .HasColumnType("text")
-                        .HasColumnName("activity_log");
-
-                    b.Property<long?>("CurrentSessionStartUnix")
-                        .HasColumnType("bigint")
-                        .HasColumnName("current_session_start_unix");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(320)

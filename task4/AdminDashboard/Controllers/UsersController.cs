@@ -36,7 +36,6 @@ public class UsersController : Controller
             Status = u.Status,
             LastLoginAt = u.LastLoginAt,
             RegisteredAt = u.RegisteredAt,
-            SparklineValues = ParseSparkline(u.ActivityLog)
         }).ToList();
 
         ViewData["FilterStatus"] = status ?? "";
@@ -58,7 +57,6 @@ public class UsersController : Controller
         var users = await _db.Users.Where(u=>selectedIds.Contains(u.Id)).ToListAsync();
         foreach (var u in users)
         {
-            AccountController.FinalizeSession(u);
             u.Status = UserStatus.Blocked;
         }
         await _db.SaveChangesAsync(); 
@@ -141,21 +139,5 @@ public class UsersController : Controller
 
         TempData["Success"] = $"{unverified.Count} unverified user(s) deleted.";
         return RedirectToAction("Index");
-    }
-
-    private static List<int> ParseSparkline(string? activityLog)
-    {
-        if (string.IsNullOrEmpty(activityLog)) return new List<int>();
-
-        var sessions = new List<(long Timestamp, int Minutes)>();
-        foreach (var entry in activityLog.Split(';', StringSplitOptions.RemoveEmptyEntries))
-        {
-            var parts = entry.Split(';');
-            if (parts.Length != 2) continue;
-            if (!long.TryParse(parts[0], out long ts)) continue; 
-            if (!int.TryParse(parts[1], out int minutes)) continue; 
-            sessions.Add((ts, minutes));
-        }
-        return sessions.OrderBy(s=>s.Timestamp).Select(s=>s.Minutes).ToList();
     }
 }

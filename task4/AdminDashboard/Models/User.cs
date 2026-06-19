@@ -25,7 +25,5 @@ public class User
     public DateTime? LastLoginAt { get; set; }
     public string? EmailVerificationToken { get; set; }
     public bool WasEverVerified { get; set; } = false;
-    public string? ActivityLog { get; set;}
-    public long? CurrentSessionStartUnix { get; set; }
 }
 

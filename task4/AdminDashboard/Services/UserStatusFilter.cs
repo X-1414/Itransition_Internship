@@ -47,7 +47,6 @@ public class UserStatusFilter : IAsyncActionFilter
         if (user.LastLoginAt == null || (DateTime.UtcNow - user.LastLoginAt.Value).TotalSeconds > 60)
         {
             user.LastLoginAt = DateTime.UtcNow;
-            AccountController.UpsertCurrentSessionDuration(user);
             await _db.SaveChangesAsync();
         }
         

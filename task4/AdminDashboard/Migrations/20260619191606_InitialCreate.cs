@@ -39,9 +39,7 @@ namespace AdminDashboard.Migrations
                     registered_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     last_login_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     email_verification_token = table.Column<string>(type: "text", nullable: true),
-                    was_ever_verified = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    activity_log = table.Column<string>(type: "text", nullable: true),
-                    current_session_start_unix = table.Column<long>(type: "bigint", nullable: true)
+                    was_ever_verified = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {

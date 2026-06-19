@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AdminDashboard.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260618094926_InitialCreate")]
+    [Migration("20260619191606_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -32,14 +32,6 @@ namespace AdminDashboard.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActivityLog")
-                        .HasColumnType("text")
-                        .HasColumnName("activity_log");
-
-                    b.Property<long?>("CurrentSessionStartUnix")
-                        .HasColumnType("bigint")
-                        .HasColumnName("current_session_start_unix");
 
                     b.Property<string>("Email")
                         .IsRequired()

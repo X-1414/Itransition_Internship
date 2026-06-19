@@ -15,7 +15,7 @@
 
     <form asp-action="Register" method="post" novalidate>
         @Html.AntiForgeryToken()
-        <div asp-validation-summary="All" class="alert alert-danger small py-2" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
 
         <div class="form-floating mb-3">
             <input asp-for="Name" class="form-control" id="name" placeholder="Full name" autocomplete="name"/>

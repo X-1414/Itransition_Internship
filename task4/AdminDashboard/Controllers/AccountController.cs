@@ -55,11 +55,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        if (user.CurrentSessionStartUnix != null)
-            FinalizeSession(user);
-
         user.LastLoginAt = DateTime.UtcNow;
-        user.CurrentSessionStartUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         await _db.SaveChangesAsync();
 
         HttpContext.Session.SetInt32("UserId", user.Id);
@@ -84,11 +80,6 @@ public class AccountController : Controller
         if (!ModelState.IsValid) return View(model);
         var emailNorm = model.Email.ToLower().Trim();
 
-        if (await _db.Users.AnyAsync(u => u.Email == emailNorm))
-        {
-            ModelState.AddModelError("Email", "This email address is already registered.");
-            return View(model);
-        }
         var token = Guid.NewGuid().ToString("N");
         var user = new User
         {
@@ -164,44 +155,11 @@ public class AccountController : Controller
         if (userId.HasValue)
         {
             var user = await _db.Users.FindAsync(userId.Value);
-            if (user != null)
-            {
-                FinalizeSession(user);
-                await _db.SaveChangesAsync();
-            }
+            if (user != null) await _db.SaveChangesAsync();
         }
 
         HttpContext.Session.Clear();
         return RedirectToAction("Login");
-    }
-
-    public static void FinalizeSession(User user)
-    {
-        if (user.CurrentSessionStartUnix == null) return;
-        UpsertCurrentSessionDuration(user);
-        user.CurrentSessionStartUnix = null;
-    }
-    
-    public static void UpsertCurrentSessionDuration(User user){
-        if (user.CurrentSessionStartUnix == null) return;
-
-        var startUnix = user.CurrentSessionStartUnix.Value;
-        var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        var durationMinutes = (int)Math.Max(1, (nowUnix-startUnix)/60);
-
-        var entries = string.IsNullOrEmpty(user.ActivityLog) ? new List<(long Start, int Minutes)>() : user.ActivityLog.Split(';', StringSplitOptions.RemoveEmptyEntries)
-        .Select(e=>{
-            var parts = e.Split(':');
-            return (Start: long.Parse(parts[0]), Minutes: int.Parse(parts[1]));
-        }).ToList();
-
-        var existingIndex = entries.FindIndex(e => e.Start == startUnix);
-        if (existingIndex >= 0) entries[existingIndex] = (startUnix, durationMinutes);
-        else entries.Add((startUnix, durationMinutes));
-
-        entries = entries.OrderBy(e=>e.Start).ToList();
-        if (entries.Count>7) entries = entries.Skip(entries.Count-7).ToList();
-        user.ActivityLog = string.Join(';', entries.Select(e=>$"{e.Start}:{e.Minutes}"));
     }
 }
     

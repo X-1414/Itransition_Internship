@@ -32,7 +32,6 @@ public class UserViewModel
     public UserStatus Status { get; set; } 
     public DateTime? LastLoginAt { get; set; }
     public DateTime RegisteredAt { get; set; }
-    public List<int> SparklineValues { get; set;} = new(); //each val = minutes during for the session (max 60 for height)
 }
 
 public class UssersFilterViewModel

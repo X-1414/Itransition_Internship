@@ -1,0 +1,198 @@
+{
+    "code": "de",
+    "label": "Deutsch (Deutschland)",
+    "nameLocale": "de",
+
+    "genres": [
+        "Indie-Pop",
+        "Synthwave",
+        "Alternative Rock",
+        "Deep House",
+        "Hip-Hop",
+        "Schlager-Pop",
+        "Volksmusik-Fusion",
+        "Elektro",
+        "Funk",
+        "Soul",
+        "Garage-Rock",
+        "Ambient",
+        "Drum and Bass",
+        "Krautrock",
+        "Liedermacher",
+        "Punkrock",
+        "Jazz-Fusion",
+        "Techno",
+        "Neue Deutsche Welle",
+        "Shoegaze",
+        "Akustik-Pop",
+        "Electro-Swing",
+        "Hyperpop",
+        "Post-Rock",
+        "Disco"
+    ],
+
+    "titleNouns": [
+        { "word": "Herz", "gender": "Neuter" },
+        { "word": "Skyline", "gender": "Feminine" },
+        { "word": "Echo", "gender": "Neuter" },
+        { "word": "Horizont", "gender": "Masculine" },
+        { "word": "Schatten", "gender": "Masculine" },
+        { "word": "Flüsse", "gender": "Masculine" },
+        { "word": "Rauschen", "gender": "Neuter" },
+        { "word": "Flamme", "gender": "Feminine" },
+        { "word": "Fata-Morgana", "gender": "Feminine" },
+        { "word": "Wölfe", "gender": "Masculine" },
+        { "word": "Gezeiten", "gender": "Feminine" },
+        { "word": "Allee", "gender": "Feminine" },
+        { "word": "Signal", "gender": "Neuter" },
+        { "word": "Blüte", "gender": "Feminine" },
+        { "word": "Schwerkraft", "gender": "Feminine" },
+        { "word": "Leuchtturm", "gender": "Masculine" },
+        { "word": "Flüstern", "gender": "Neuter" },
+        { "word": "Schwindel", "gender": "Masculine" },
+        { "word": "Kompass", "gender": "Masculine" },
+        { "word": "Asche", "gender": "Feminine" },
+        { "word": "Umlaufbahn", "gender": "Feminine" },
+        { "word": "Tagtraum", "gender": "Masculine" },
+        { "word": "Aufstand", "gender": "Masculine" },
+        { "word": "Sternbilder", "gender": "Neuter" },
+        { "word": "Glanz", "gender": "Masculine" }
+    ],
+
+    "titleAdjectives": [
+        { "word": "Zerbrochener", "gender": "Masculine" },
+        { "word": "Zerbrochene", "gender": "Feminine" },
+        { "word": "Zerbrochenes", "gender": "Neuter" },
+
+        { "word": "Elektrischer", "gender": "Masculine" },
+        { "word": "Elektrische", "gender": "Feminine" },
+        { "word": "Elektrisches", "gender": "Neuter" },
+
+        { "word": "Stummer", "gender": "Masculine" },
+        { "word": "Stumme", "gender": "Feminine" },
+        { "word": "Stummes", "gender": "Neuter" },
+
+        { "word": "Goldener", "gender": "Masculine" },
+        { "word": "Goldene", "gender": "Feminine" },
+        { "word": "Goldenes", "gender": "Neuter" },
+
+        { "word": "Verlorener", "gender": "Masculine" },
+        { "word": "Verlorene", "gender": "Feminine" },
+        { "word": "Verlorenes", "gender": "Neuter" },
+
+        { "word": "Endloser", "gender": "Masculine" },
+        { "word": "Endlose", "gender": "Feminine" },
+        { "word": "Endloses", "gender": "Neuter" },
+
+        { "word": "Wilder", "gender": "Masculine" },
+        { "word": "Wilde", "gender": "Feminine" },
+        { "word": "Wildes", "gender": "Neuter" },
+
+        { "word": "Samtiger", "gender": "Masculine" },
+        { "word": "Samtige", "gender": "Feminine" },
+        { "word": "Samtiges", "gender": "Neuter" },
+
+        { "word": "Neonfarbener", "gender": "Masculine" },
+        { "word": "Neonfarbene", "gender": "Feminine" },
+        { "word": "Neonfarbenes", "gender": "Neuter" },
+
+        { "word": "Hohler", "gender": "Masculine" },
+        { "word": "Hohle", "gender": "Feminine" },
+        { "word": "Hohles", "gender": "Neuter" },
+
+        { "word": "Purpurner", "gender": "Masculine" },
+        { "word": "Purpurne", "gender": "Feminine" },
+        { "word": "Purpurnes", "gender": "Neuter" },
+
+        { "word": "Gefrorener", "gender": "Masculine" },
+        { "word": "Gefrorene", "gender": "Feminine" },
+        { "word": "Gefrorenes", "gender": "Neuter" },
+
+        { "word": "Brennender", "gender": "Masculine" },
+        { "word": "Brennende", "gender": "Feminine" },
+        { "word": "Brennendes", "gender": "Neuter" },
+
+        { "word": "Ferner", "gender": "Masculine" },
+        { "word": "Ferne", "gender": "Feminine" },
+        { "word": "Fernes", "gender": "Neuter" },
+
+        { "word": "Ruheloser", "gender": "Masculine" },
+        { "word": "Ruhelose", "gender": "Feminine" },
+        { "word": "Ruheloses", "gender": "Neuter" },
+
+        { "word": "Glasklarer", "gender": "Masculine" },
+        { "word": "Glasklare", "gender": "Feminine" },
+        { "word": "Glasklares", "gender": "Neuter" },
+
+        { "word": "Mitternächtlicher", "gender": "Masculine" },
+        { "word": "Mitternächtliche", "gender": "Feminine" },
+        { "word": "Mitternächtliches", "gender": "Neuter" },
+
+        { "word": "Verblasster", "gender": "Masculine" },
+        { "word": "Verblasste", "gender": "Feminine" },
+        { "word": "Verblasstes", "gender": "Neuter" },
+
+        { "word": "Ewiger", "gender": "Masculine" },
+        { "word": "Ewige", "gender": "Feminine" },
+        { "word": "Ewiges", "gender": "Neuter" },
+
+        { "word": "Leiser", "gender": "Masculine" },
+        { "word": "Leise", "gender": "Feminine" },
+        { "word": "Leises", "gender": "Neuter" },
+
+        { "word": "Rücksichtsloser", "gender": "Masculine" },
+        { "word": "Rücksichtslose", "gender": "Feminine" },
+        { "word": "Rücksichtsloses", "gender": "Neuter" },
+
+        { "word": "Strahlender", "gender": "Masculine" },
+        { "word": "Strahlende", "gender": "Feminine" },
+        { "word": "Strahlendes", "gender": "Neuter" },
+
+        { "word": "Bitterer", "gender": "Masculine" },
+        { "word": "Bittere", "gender": "Feminine" },
+        { "word": "Bitteres", "gender": "Neuter" },
+
+        { "word": "Zärtlicher", "gender": "Masculine" },
+        { "word": "Zärtliche", "gender": "Feminine" },
+        { "word": "Zärtliches", "gender": "Neuter" }
+    ],
+
+    "albumWords": [
+        "Sitzungen",
+        "Chroniken",
+        "Fragmente",
+        "Briefe",
+        "Tagebücher",
+        "Hymnen",
+        "Aufnahmen",
+        "Notizen",
+        "Visionen",
+        "Reflexionen",
+        "Abreisen",
+        "Ankünfte",
+        "Memoiren",
+        "Pulsschlag",
+        "Rauschen",
+        "Blüte",
+        "Echos",
+        "Strömungen"
+    ],
+
+    "reviewSentences": [
+        "Eine überraschend straffe Produktion für so kurze Spielzeit.",
+        "Der Refrain bleibt lange nach dem Song im Ohr.",
+        "Klingt wie eine nächtliche Fahrt durch eine leere Stadt.",
+        "Nicht bahnbrechend, aber emotional ehrlich und gut arrangiert.",
+        "Der Mix könnte mehr Bass vertragen, die Melodie trägt es trotzdem.",
+        "Eine ungewöhnliche Genre-Mischung, die meistens funktioniert.",
+        "Eingängiger Hook, etwas repetitive Struktur.",
+        "Dieser Song wächst nach ein paar Durchläufen.",
+        "Mehr Produktionsglanz als Substanz, aber dennoch unterhaltsam.",
+        "Eine solide Ergänzung für jede Spätsommer-Playlist.",
+        "Die Gesangsleistung ist hier klar der Höhepunkt.",
+        "Viel Energie in der Bridge, schwächere Eröffnungsstrophe.",
+        "Klingt, als wäre es für Kopfhörer gemacht, nicht für Lautsprecher.",
+        "Eine selbstbewusste, wenn auch vertraute, Genre-Interpretation.",
+        "Überraschend minimalistisches Arrangement, das hier gut funktioniert."
+    ]
+}

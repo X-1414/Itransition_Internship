@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Playlist.Data;
 
@@ -6,28 +7,44 @@ namespace Playlist.Locales;
 public static class LocaleSeeder{
     public static async Task SeedAsync(PlaylistDbContext db){
         if (await db.Locales.AnyAsync()) return;
-        SeedLocale(db, EnglishLocaleSeed.Code, EnglishLocaleSeed.Label, EnglishLocaleSeed.NameLocale, EnglishLocaleSeed.Genres, EnglishLocaleSeed.TitleNouns, EnglishLocaleSeed.TitleAdjectives, EnglishLocaleSeed.AlbumWords, EnglishLocaleSeed.ReviewSentences);
-        SeedLocale(db, GermanLocaleSeed.Code, GermanLocaleSeed.Label, GermanLocaleSeed.NameLocale, GermanLocaleSeed.Genres, GermanLocaleSeed.TitleNouns, GermanLocaleSeed.TitleAdjectives, GermanLocaleSeed.AlbumWords, GermanLocaleSeed.ReviewSentences);
+        string localeFolder = Path.Combine(AppContext.BaseDirectory, "Locales");
+
+        if(!Directory.Exists(localeFolder))
+            throw new DirectoryNotFoundException($"Locale folder not found: {localeFolder}");
+        
+        var jsonFiles = Directory.GetFiles(localeFolder, "*.json");
+
+        foreach (var file in jsonFiles)
+        {
+            string json = await File.ReadAllTextAsync(file);
+            var locale = JsonSerializer.Deserialize<LocaleFile>( json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (locale==null) continue;
+            SeedLocale(db, locale);
+        }
         await db.SaveChangesAsync();
     }
 
-    private static void SeedLocale(PlaylistDbContext db, string code, string label, string nameLocale, string[] genres, (string Word, Gender Gender)[] nouns, (string Word, Gender Gender)[] adjectives, string[] albumWords, string[] reviewSentences){
-        var locale = new Locale {Code=code, Label=label, NameLocale=nameLocale};
-        db.Locales.Add(locale);
+    private static void SeedLocale(PlaylistDbContext db, LocaleFile localeFile){
+        db.Locales.Add(new Locale
+        {
+            Code = localeFile.Code,
+            Label = localeFile.Label,
+            NameLocale = localeFile.NameLocale
+        });
 
-        foreach(var g in genres)
-            db.Genres.Add(new Genre { LocaleCode = code, Name = g});
+        foreach(var g in localeFile.Genres)
+            db.Genres.Add(new Genre { LocaleCode = localeFile.Code, Name = g});
 
-        foreach(var (word, gender) in nouns)
-            db.TitleNouns.Add(new TitleNoun { LocaleCode = code,  Word=word, Gender=gender});
+        foreach(var noun in localeFile.TitleNouns)
+            db.TitleNouns.Add(new TitleNoun { LocaleCode = localeFile.Code,  Word=noun.Word, Gender=noun.ToGender()});
 
-        foreach(var (word, gender) in adjectives)
-            db.TitleAdjectives.Add(new TitleAdjective { LocaleCode = code, Word=word, Gender=gender});
+        foreach(var adjective in localeFile.TitleAdjectives)
+            db.TitleAdjectives.Add(new TitleAdjective { LocaleCode = localeFile.Code, Word=adjective.Word, Gender=adjective.ToGender()});
 
-        foreach(var w in albumWords)
-            db.AlbumWords.Add(new AlbumWord { LocaleCode = code, Word = w});
+        foreach(var w in localeFile.AlbumWords)
+            db.AlbumWords.Add(new AlbumWord { LocaleCode = localeFile.Code, Word = w});
 
-        foreach(var r in reviewSentences)
-            db.ReviewSentences.Add(new ReviewSentence { LocaleCode = code, Text = r});
+        foreach(var r in localeFile.ReviewSentences)
+            db.ReviewSentences.Add(new ReviewSentence { LocaleCode = localeFile.Code, Text = r});
     }
 }

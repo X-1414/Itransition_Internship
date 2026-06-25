@@ -13,13 +13,7 @@ public static class Mp3Encoder
         lock (ConfigureLock)
         {
             if (_configured) return;
-            string ffmpegBinFolder = Path.Combine(AppContext.BaseDirectory, "ffmpeg", "bin");
-            if (!Directory.Exists(ffmpegBinFolder))
-            {
-                throw new DirectoryNotFoundException($"Expected ffmpeg binaries at '{ffmpegBinFolder}' but that folder doesn't exist. ");
-            }
-            GlobalFFOptions.Configure(new FFOptions { BinaryFolder = ffmpegBinFolder });
-            _configured = true;
+            GlobalFFOptions.Configure(new FFOptions());
         }
     }
 

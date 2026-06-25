@@ -13,7 +13,6 @@
     <PackageReference Include="Bogus" Version="35.6.5"/>
 
     <PackageReference Include="FFMpegCore" Version="5.4.0" />
-    <PackageReference Include="FFMpegInstaller.Windows.x64" Version="0.1.10"/>
   </ItemGroup>
 
   <ItemGroup>

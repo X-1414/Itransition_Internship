@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%2315131a%22/><circle cx=%2250%22 cy=%2250%22 r=%2236%22 fill=%22none%22 stroke=%22%23e8a23d%22 stroke-width=%224%22/><circle cx=%2250%22 cy=%2250%22 r=%228%22 fill=%22%23e8a23d%22/></svg>">
+        <title>Vinyl and Static - Fake Music Catalog</title>
+        <link rel="stylesheet" href="/css/style.css">
+    </head>
+    <body>
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">◎</span>
+                <span class="brand-name">Vinyl<span class="brand-amp"> and </span>Static</span>
+            </div>
+            <div class="brand-tagline">a catalog of songs that don't exist</div>
+        </header>
+
+        <form class="toolbar" id="toolbar" autocomplete="off">
+            <div class="toolbar-group">
+                <label for="locale-select">Language / Region</label>
+                <select id="locale-select" name="locale"></select>
+            </div>
+            <div class="toolbar-group toolbar-group--seed">
+                <label for="seed-input">Seed</label>
+                <div class="seed-row">
+                    <input id="seed-input" name="seed" type="text" inputmode="numeric" placeholder="e.g. 1234567890" maxlength="20">
+                    <button type="button" id="randomize-seed" class="btn-ghost" title="Generate random seed">🎲</button>
+                </div>
+            </div>
+
+            <div class="toolbar-group toolbar-group--likes">
+                <label for="likes-input">Avg. likes per song <span id="likes-value">3.0</span></label>
+                <input id="likes-input" name="likes" type="range" min="0" max="10" step="0.1" value="3">
+            </div>
+
+            <div class="toolbar-group toolbar-group--view">
+                <label>View</label>
+                <div class="view-toggle" role="group" aria-label="Display mode">
+                   <button type="button" class="view-btn is-active" data-view="table">Table</button>
+                   <button type="button" class="view-btn" data-view="gallery">Gallery</button>
+                </div>
+            </div>
+
+            <div class="toolbar-group toolbar-group--export">
+                <label>&nbsp;</label>
+                <button type="button" id="export-btn" class="btn-primary">Export Zip</button>
+            </div>
+        </form>
+
+        <main id="app">
+            <section id="table-view" class="view-panel">
+                <table class="song-table">
+                    <thead>
+                        <tr>
+                            <th class="col-index">#</th>
+                            <th class="col-title">Title</th>
+                            <th class="col-artist">Artist</th>
+                            <th class="col-album">Album</th>
+                            <th class="col-genre">Genre</th>
+                            <th class="col-likes">Likes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+                <nav class="pagination" id="pagination" aria-label="Pagination"></nav>
+            </section>
+
+            <section id="gallery-view" class="view-panel" hidden>
+                <div class="gallery-grid" id="gallery-grid"></div>
+                <div class="gallery-sentinel" id="gallery-sentinel" aria-hidden="true"></div>
+                <div class="gallery-loading" id="gallery-loading">Loading more...</div>
+            </section>
+        </main>
+
+        <div class="detail-overlay" id="detail-overlay" hidden>
+            <div class="detail-card" id="detail-card" role="dialog" aria-modal="true" aria-label="Song details">
+                <button class="detail-close" id="detail-close" aria-label="Close">x</button>
+                <div class="detail-body" id="detail-body"></div>
+            </div>
+        </div>
+
+        <div class="toast" id="export-toast" hidden></div>
+        <script src="/js/app.js" type="module"></script>
+    </body>
+</html>

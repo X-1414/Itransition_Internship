@@ -64,7 +64,7 @@ public static class CoverGenerator{
         for(int row = 0; row < cells; row++){
             for (int col = 0; col < cells; col++){
                 if (Rng.Chance(rng, 0.45)){
-                    byte opacity = (byte)(Rng.FloatBetween(rng, 0.08, 022) * 255);
+                    byte opacity = (byte)(Rng.FloatBetween(rng, 0.08, 0.22) * 255);
                     using var paint = new SKPaint {Color = p.Accent.WithAlpha(opacity),IsAntialias=true};
                     canvas.DrawRect(col*size, row*size, size, size, paint);
                 }

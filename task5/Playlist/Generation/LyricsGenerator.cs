@@ -1,6 +1,7 @@
-using System.Globalization;
+using System;
 using Playlist.Data;
 using Playlist.Lib;
+using Playlist.Locales;
 
 namespace Playlist.Generation;
 
@@ -22,7 +23,7 @@ public static class LyricsGenerator
 
     private static string Lower(string s) => s.ToLowerInvariant();
 
-    public static List<LyricLine> Build (Locale locale, uint musicSeed, SongPlan plan)
+    public static List<LyricLine> Build (LocaleFile locale, uint musicSeed, SongPlan plan)
     {
         var rng = Rng.Mulberry32(musicSeed ^ 0x2545f491u);
 
@@ -35,7 +36,7 @@ public static class LyricsGenerator
         {
             var nounEntry = Rng.Pick(rng, locale.TitleNouns);
             string noun = nounEntry.Word;
-            var adjPool = GenderAgreement.AdjectivesForGender(locale, nounEntry.Gender);
+            var adjPool = GenderAgreement.AdjectivesForGender(locale, nounEntry.ToGender());
             string adj = Rng.Pick(rng, adjPool).Word;
             var pattern = Rng.Pick(rng, Patterns);
             string text = pattern(adj, noun);

@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using Playlist.Data;
 using Playlist.Lib;
+using Playlist.Locales;
 
 namespace Playlist.Generation;
 
@@ -14,12 +15,12 @@ public static class ExportService
         return cleaned.Length > 80 ? cleaned[..80] : cleaned;
     }
 
-    public static byte[] BuildZip(Locale locale, string seedInput, double likesAvg, int startIndex, int count)
+    public static byte[] BuildZip(LocaleFile locale, string seedInput, double likesAvg, int startIndex, int count)
     {
         return BuildZip(locale, seedInput, likesAvg, GenerateIndexes(startIndex, count));
     }
 
-    public static byte[] BuildZip(Locale locale, string seedInput, double likesAvg, IReadOnlyList<int> indexes)
+    public static byte[] BuildZip(LocaleFile locale, string seedInput, double likesAvg, IReadOnlyList<int> indexes)
     {
         if (indexes == null || indexes.Count == 0)
         {

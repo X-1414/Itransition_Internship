@@ -8,7 +8,7 @@ export function renderDetailContent(record){
     return `
         <div class="detail-content">
         <img class="detail-cover" src="${record.coverUrl}" alt="Cover art for ${escapeHtml(record.title)}" loading="lazy">
-        <div class="detailed-meta">
+        <div class="detail-meta">
             <h3>${escapeHtml(record.title)}</h3>
             <p class="detail-artist">${escapeHtml(record.artist)}</p>
             <div class="detail-tags">

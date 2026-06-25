@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Bogus;
 using Playlist.Data;
 using Playlist.Lib;
+using Playlist.Locales;
 
 namespace Playlist.Generation;
 
@@ -36,7 +37,7 @@ public class RecordGenerator {
         return Regex.Replace(first, "[,.;:]+$", "");
     }
 
-    public SongRecord Generate (int index, Locale locale, object userSeed, double likesAvg){
+    public SongRecord Generate (int index, LocaleFile locale, object userSeed, double likesAvg){
         var contentRng = Rng.StreamRng(userSeed, index, "content");
         var likesRng = Rng.StreamRng(userSeed, index, "likes", likesAvg);
         int fakerSeed = (int)Math.Floor(contentRng() * Math.Pow(2, 31));
@@ -48,7 +49,7 @@ public class RecordGenerator {
         string artist = isBand ? StripLegalForm(rawArtist) : rawArtist;
         var nounEntry = Rng.Pick(contentRng, locale.TitleNouns);
         string noun = nounEntry.Word;
-        var adjPool = GenderAgreement.AdjectivesForGender(locale, nounEntry.Gender);
+        var adjPool = GenderAgreement.AdjectivesForGender(locale, nounEntry.ToGender());
         string adjective = Rng.Pick(contentRng, adjPool).Word;
     
         int titlePattern = Rng.IntBetween(contentRng, 0, 2);
@@ -59,10 +60,10 @@ public class RecordGenerator {
         };
 
         bool isSingle = Rng.Chance(contentRng, 0.35);
-        string albumWord = Rng.Pick(contentRng, locale.AlbumWords).Word;
+        string albumWord = Rng.Pick(contentRng, locale.AlbumWords);
         string albumTitle = isSingle ? "Single" : $"{FirstMeaningfulWord(artist)} {albumWord}";
-        string genre = Rng.Pick(contentRng, locale.Genres).Name;
-        string reviewText = Rng.Pick(contentRng, locale.ReviewSentences).Text;
+        string genre = Rng.Pick(contentRng, locale.Genres);
+        string reviewText = Rng.Pick(contentRng, locale.ReviewSentences);
         int likes = Rng.LikesFromAverage(likesRng, likesAvg);
 
         uint coverSeed = (uint)Math.Floor(contentRng() * Math.Pow(2, 31));

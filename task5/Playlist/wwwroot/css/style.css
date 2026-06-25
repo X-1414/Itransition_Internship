@@ -52,10 +52,7 @@ button { font-family: inherit; }
   color: var(--amber);
   font-size: 20px;
   display: inline-block;
-  animation: spin 6s linear infinite;
-  animation-play-state: paused;
 }
-.brand:hover .brand-mark { animation-play-state: running; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .brand-amp { color: var(--amber); margin: 0 1px; font-weight: 500; }
 .brand-tagline {
@@ -414,7 +411,3 @@ audio::-webkit-media-controls-panel { background: var(--bg-input); }
   .song-table .col-album, .song-table .col-genre { display: none; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .brand-mark { animation: none; }
-  .gallery-card { transition: none; }
-}

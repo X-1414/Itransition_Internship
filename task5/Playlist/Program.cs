@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
 using Playlist.Data;
 using Playlist.Generation;
 using Playlist.Lib;
@@ -10,9 +9,6 @@ const double MinLikesAvg = 0.0;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string connectionString = Environment.GetEnvironmentVariable("PLAYLIST_DB_CONNECTION") ?? builder.Configuration.GetConnectionString("Default") ?? "Host=localhost;Port=5432;Database=playlist;Username=postgres;Password=postgres";
-
-builder.Services.AddDbContext<PlaylistDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddSingleton<LocaleCache>();
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -21,17 +17,11 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 var app = builder.Build();
-using(var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<PlaylistDbContext>();
-    await db.Database.EnsureCreatedAsync();
-    await LocaleSeeder.SeedAsync(db); 
-}
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-async Task<(string? Error, string LocaleCode, Locale? Locale, string SeedInput, double LikesAvg)>
+async Task<(string? Error, string LocaleCode, LocaleFile? Locale, string SeedInput, double LikesAvg)>
     ParseCommonParamsAsync(HttpRequest request, LocaleCache localeCache)
 {
     string localeCode = request.Query["locale"].FirstOrDefault() ?? "en";
@@ -56,7 +46,7 @@ async Task<(string? Error, string LocaleCode, Locale? Locale, string SeedInput, 
 
 uint NumericSeed(string seedInput) => Rng.HashSeed("user-seed", seedInput);
 
-SongRecord GetFullRecord(int index, Locale locale, string seedInput, double likesAvg)
+SongRecord GetFullRecord(int index, LocaleFile locale, string seedInput, double likesAvg)
 {
     uint seed = NumericSeed(seedInput);
     var generator = new RecordGenerator();

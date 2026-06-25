@@ -49,6 +49,8 @@ let tableView;
 let galleryView;
 let activeView = 'table';
 
+const debouncedLikesChanged = debounce(onLikesChanged, 200);
+
 let tableLikesStale = false;
 let galleryLikesStale = false;
 
@@ -70,14 +72,16 @@ async function setActiveView(view){
     tableViewPanel.hidden = view !== 'table';
     galleryViewPanel.hidden = view !== 'gallery';
     if (view === 'gallery'){
-        galleryView.activate();
+        await galleryView.activate();
         if (galleryLikesStale){
             galleryView.refreshLoaded();
             galleryLikesStale = false;
         } 
-    } else if (tableLikesStale) {
-            tableView.refreshCurrentPage();
+    } else {
+        if (tableLikesStale) {
+            await tableView.refreshCurrentPage();
             tableLikesStale = false;
+        }
     }
 }
 
@@ -110,7 +114,7 @@ async function init(){
     randomizeSeedBtn.addEventListener('click', ()=>{seedInput.value=randomSeed(); onParamsChanged();});
     likesInput.addEventListener('input', ()=>{
         likesValueLabel.textContent = parseFloat(likesInput.value).toFixed(1);
-        debounce(onLikesChanged, 200)();
+        debouncedLikesChanged();
     });
 
     viewButtons.forEach((btn)=>{btn.addEventListener('click', ()=>setActiveView(btn.dataset.view));

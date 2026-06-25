@@ -66,8 +66,8 @@ A single-page web application that generates an endless, fully reproducible cata
 * Export visible songs as ZIP archive
 * Includes generated MP3 files
 * Supports exporting:
-  * Current table page (20 songs)
-  * Currently loaded gallery items (24 songs)
+  * Current table page
+  * Currently loaded gallery items
 
 ---
 

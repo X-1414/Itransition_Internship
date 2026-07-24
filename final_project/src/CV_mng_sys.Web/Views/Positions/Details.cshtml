@@ -1,0 +1,70 @@
+@if (User.IsInRole("Candidate"))
+{
+    <form asp-controller="Cv" asp-action="Generate" method="post" class="mb-3">
+        <input type="hidden" name="positionId" value="@Model.Id" />
+        <button type="submit" class="btn btn-success">Generate CV for this Position</button>
+    </form>
+}
+
+@model CV_mng_sys.Core.Entities.Position
+@{
+    ViewData["Title"] = Model.Title;
+    bool canManage = User.IsInRole("Recruiter") || User.IsInRole("Administrator");
+}
+
+<h1>@Model.Title</h1>
+<p>@Model.Description</p>
+
+<h3>Attributes on this position's CV template</h3>
+<table class="table">
+    <thead><tr><th>Name</th><th>Type</th><th>Required</th>@if (canManage) { <th></th> }</tr></thead>
+    <tbody>
+        @foreach (var pa in Model.Attributes.OrderBy(a => a.SortOrder))
+        {
+            <tr>
+                <td>@pa.AttributeDefinition.Name</td>
+                <td>@pa.AttributeDefinition.DataType</td>
+                <td>@(pa.IsRequired ? "Yes" : "No")</td>
+                @if (canManage)
+                {
+                    <td>
+                        <form asp-action="RemoveAttribute" method="post" class="d-inline">
+                            <input type="hidden" name="positionAttributeId" value="@pa.Id" />
+                            <input type="hidden" name="positionId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                        </form>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (canManage)
+{
+    <h4>Add attribute from library</h4>
+    <form asp-action="AddAttribute" method="post" class="row g-2">
+        <input type="hidden" name="positionId" value="@Model.Id" />
+        <div class="col-auto">
+            <select name="attributeDefinitionId" class="form-select" id="attrSelect"></select>
+        </div>
+        <div class="col-auto form-check mt-2">
+            <input type="checkbox" name="isRequired" value="true" class="form-check-input" id="isRequired" />
+            <label class="form-check-label" for="isRequired">Required</label>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+    </form>
+    <script>
+        fetch('/Attributes/ListJson').then(r => r.json()).then(data => {
+            const select = document.getElementById('attrSelect');
+            data.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.id;
+                opt.textContent = `${a.name} (${a.dataType})`;
+                select.appendChild(opt);
+            });
+        });
+    </script>
+}

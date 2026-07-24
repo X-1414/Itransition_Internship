@@ -1,0 +1,53 @@
+@model List<(CV_mng_sys.Core.Entities.AttributeDefinition Definition, CV_mng_sys.Core.Entities.CandidateAttributeValue? Value)>
+@{
+    ViewData["Title"] = "My Profile - Info";
+}
+
+<h1>My Profile</h1>
+<p class="text-muted">Fill in values here once - they'll auto-populate any CV you generate for a matching position.</p>
+
+<table class="table align-middle">
+    <thead><tr><th>Attribute</th><th>Type</th><th>Value</th><th style="width:80px;">Status</th></tr></thead>
+    <tbody>
+        @foreach (var (def, val) in Model)
+        {
+            <tr data-attr-id="@def.Id" data-version="@(val?.Version ?? 0)">
+                <td>@def.Name</td>
+                <td>@def.DataType</td>
+                <td>
+                    @if (def.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Dropdown)
+                    {
+                        <select class="form-select form-select-sm profile-value">
+                            <option value="">--</option>
+                            @foreach (var opt in def.GetDropdownOptions())
+                            {
+                                <option value="@opt" selected="@(val?.Value == opt)">@opt</option>
+                            }
+                        </select>
+                    }
+                    else if (def.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Checkbox)
+                    {
+                        <input type="checkbox" class="form-check-input profile-value" checked="@(val?.Value == "true")" />
+                    }
+                    else if (def.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Number)
+                    {
+                        <input type="number" step="any" class="form-control form-control-sm profile-value" value="@val?.Value" placeholder="Any number (e.g. 3.9, 42)" />
+                    }
+                    else if (def.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Date)
+                    {
+                        <input type="date" class="form-control form-control-sm profile-value" value="@val?.Value" placeholder="yyyy-mm-dd" />
+                    }
+                    else
+                    {
+                        <input type="text" class="form-control form-control-sm profile-value" placeholder="Free text" value="@val?.Value" />
+                    }
+                </td>
+                <td class="save-status text-muted small"></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="~/js/profile-autosave.js"></script>
+}

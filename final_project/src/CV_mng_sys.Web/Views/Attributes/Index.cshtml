@@ -1,0 +1,83 @@
+@model List<CV_mng_sys.Core.Entities.AttributeDefinition>
+@{
+    ViewData["Title"] = "Attributes";
+}
+
+<h1>Attribute Library</h1>
+<p class="text-muted">This is a list of all attributes that Positions and Candidates can reference</p>
+
+<!-- toolbar -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div id="toolbar">
+        <button id="btnNew" class="btn btn-primary btn-sm">
+            <i class="bi-biPlus-lg"></i> Create New Attribute
+        </button>
+        <button id="btnEdit" class="btn btn-secondary btn-sm" disabled>Edit</button>
+        <button id="btnDelete" class="btn btn-outline-danger btn-sm" disabled>Delete</button>
+    </div>
+</div>
+
+<table class="table table-hover align-middle" id="attributesTable">
+    <thead>
+        <tr>
+            <th style="width: 40px;"></th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Options</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var attribute1 in Model)
+        {
+            <tr data-id="@attribute1.Id" data-version="@attribute1.Version" data-name="@attribute1.Name" data-datatype="@((int)attribute1.DataType)" data-options="@attribute1.DropdownOptionsRaw" class="attribute-row" style="cursor: pointer;">
+                <td><input type="radio" name="selectedAttribute" class="form-check-input row-select" /></td>
+                <td>@attribute1.Name</td>
+                <td>@attribute1.DataType</td>
+                <td>@attribute1.DropdownOptionsRaw</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- modal for creat and edit-->
+<div class="modal fade" id="attributeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Create New Attribute</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalError" class="alert alert-danger d-none"></div>
+                <input type="hidden" id="attributeId" />
+                <input type="hidden" id="attributeVersion" />
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" id="attributeName" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Data Type</label>
+                    <select class="form-select" id="attributeDataType">
+                        <option value="0">Text</option>
+                        <option value="1">Number</option>
+                        <option value="2">Dropdown</option>
+                        <option value="3">Checkbox</option>
+                        <option value="4">Date</option>
+                    </select>
+                </div>
+                <div class="mb-3 d-none" id="dropdownOptionsGroup">
+                    <label class="form-label">Options (comma-separated)</label>
+                    <input type="text" class="form-control" id="attributeOptions" placeholder="Beginner, Intermediate, Advanced" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btnSave">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/attributes.js"></script>
+}

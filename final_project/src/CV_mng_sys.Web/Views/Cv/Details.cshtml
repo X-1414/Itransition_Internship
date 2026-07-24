@@ -1,0 +1,89 @@
+@model CV_mng_sys.Core.Entities.CvDocument
+@{
+    ViewData["Title"] = "CV - " + Model.Position.Title;
+    bool isOwner = ViewBag.IsOwner;
+    bool canPublish = ViewBag.CanPublish;
+    var rows = (List<CV_mng_sys.Core.Services.CvAttributeRow>)ViewBag.Rows;
+}
+
+<h1>CV: @Model.Position.Title</h1>
+<p>
+    <span class="badge @(Model.Status == CV_mng_sys.Core.Entities.CvStatus.Published ? "bg-success" : "bg-secondary")">
+        @Model.Status
+    </span>
+    @if (!isOwner)
+    {
+        <span class="text-muted">Candidate: @Model.CandidateUser.Email</span>
+    }
+</p>
+
+@if (isOwner)
+{
+    <div class="mb-3" id="cvActions" data-cv-id="@Model.Id" data-version="@Model.Version">
+        @if (Model.Status == CV_mng_sys.Core.Entities.CvStatus.Draft)
+        {
+            <button id="btnPublish" class="btn btn-success btn-sm" disabled="@(!canPublish)">Publish</button>
+            @if (!canPublish)
+            {
+                <span class="text-danger small ms-2">Fill in all required (*) fields to publish.</span>
+            }
+        }
+        else
+        {
+            <button id="btnUnpublish" class="btn btn-outline-secondary btn-sm">Unpublish (back to Draft)</button>
+        }
+    </div>
+}
+
+<table class="table align-middle">
+    <thead><tr><th>Attribute</th><th>Value</th><th style="width:80px;">Status</th></tr></thead>
+    <tbody>
+        @foreach (var row in rows)
+        {
+            bool isEmpty = string.IsNullOrWhiteSpace(row.Value);
+            <tr class="@(isEmpty ? "table-danger" : "")" data-attr-id="@row.AttributeDefinitionId" data-version="@row.ValueVersion">
+                <td>@row.Name @(row.IsRequired ? "*" : "")</td>
+                <td>
+                    @if (!isOwner)
+                    {
+                        @(isEmpty ? "(empty)" : row.Value)
+                    }
+                    else if (row.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Dropdown)
+                    {
+                        <select class="form-select form-select-sm cv-value">
+                            <option value="">--</option>
+                            @foreach (var opt in row.DropdownOptionsRaw?.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>())
+                            {
+                                <option value="@opt" selected="@(row.Value == opt)">@opt</option>
+                            }
+                        </select>
+                    }
+                    else if (row.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Checkbox)
+                    {
+                        <input type="checkbox" class="form-check-input cv-value" checked="@(row.Value == "true")" />
+                    }
+                    else if (row.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Number)
+                    {
+                        <input type="number" step="any" class="form-control form-control-sm cv-value" value="@row.Value" />
+                    }
+                    else if (row.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Date)
+                    {
+                        <input type="date" class="form-control form-control-sm cv-value" value="@row.Value" />
+                    }
+                    else
+                    {
+                        <input type="text" class="form-control form-control-sm cv-value" value="@row.Value" />
+                    }
+                </td>
+                <td class="save-status text-muted small"></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (isOwner)
+{
+    @section Scripts {
+        <script src="~/js/cv-details.js"></script>
+    }
+}

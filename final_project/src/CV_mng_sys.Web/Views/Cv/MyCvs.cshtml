@@ -1,0 +1,17 @@
+@model List<CV_mng_sys.Core.Entities.CvDocument>
+@{ ViewData["Title"] = "My CVs"; }
+
+<h1>My CVs</h1>
+<table class="table table-hover">
+    <thead><tr><th>Position</th><th>Status</th><th>Created</th></tr></thead>
+    <tbody>
+        @foreach (var cv in Model)
+        {
+            <tr style="cursor:pointer" onclick="window.location='/Cv/Details/@cv.Id'">
+                <td>@cv.Position.Title</td>
+                <td><span class="badge @(cv.Status == CV_mng_sys.Core.Entities.CvStatus.Published ? "bg-success" : "bg-secondary")">@cv.Status</span></td>
+                <td>@cv.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+            </tr>
+        }
+    </tbody>
+</table>

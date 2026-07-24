@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CV_mng_sys.Core/CV_mng_sys.Core.csproj" />
+    <Project Path="src/CV_mng_sys.Web/CV_mng_sys.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CV_mng_sys.Tests/CV_mng_sys.Tests.csproj" />
+  </Folder>
+</Solution>

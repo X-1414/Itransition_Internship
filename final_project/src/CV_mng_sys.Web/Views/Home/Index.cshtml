@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="px-4 py-5 text-center">
+    <h1 class="display-5 fw-bold">CV Management System</h1>
+    <p class="col-lg-8 mx-auto lead">
+        Recruiters build customizable position templates from a reusable attribute library.
+        Candidates fill in their profile once and generate a tailored CV for any position they're eligible for.
+    </p>
+    <a class="btn btn-primary btn-lg" asp-controller="Positions" asp-action="Index">Browse Positions</a>
+    @if (!User.Identity!.IsAuthenticated)
+    {
+        <a class="btn btn-outline-secondary btn-lg" asp-area="Identity" asp-page="/Account/Register">Register</a>
+    }
+</div>
+
+<div class="row text-center mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="display-6">@ViewBag.NewCvsLast24h</h2>
+                <p class="text-muted mb-0">New CVs created in the last 24 hours</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="display-6">@ViewBag.ActivePositions</h2>
+                <p class="text-muted mb-0">Open positions</p>
+            </div>
+        </div>
+    </div>
+</div>

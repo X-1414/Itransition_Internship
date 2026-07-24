@@ -15,9 +15,9 @@ obj/
 *.swp
 
 # Build artifacts
-dist/
-build/
-out/
+/dist/
+/build/
+/out/
 
 # Build output folders
 Debug/

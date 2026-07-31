@@ -1,166 +1,188 @@
-@using System.Formats.Cbor
-@using Microsoft.EntityFrameworkCore.Metadata.Internal
-@if (User.IsInRole("Candidate"))
-{
-    bool hasAccess = ViewBag.CandidateHasAccess;
-    @if (hasAccess)
-    {
-        <form asp-controller="Cv" asp-action="Generate" method="post" class="mb-3">
-            <input type="hidden" name="positionId" value="@Model.Id" />
-            <button type="submit" class="btn btn-success">Generate CV for this Position</button>
-        </form>
-    }
-    else
-    {
-        var unmet = (List<string>)ViewBag.UnmetAttributes;
-        <div class="alert alert-warning">
-            You don't currently meet this position's access requirements. 
-            @if (unmet.Any())
-            {
-                <span>The following attributes don't meet this position's access criteria: <strong>@string.Join(", ", unmet)</strong>.</span>
-            }
-        </div>
-    }
-}
-
 @model CV_mng_sys.Core.Entities.Position
 @{
     ViewData["Title"] = Model.Title;
     bool canManage = User.IsInRole("Recruiter") || User.IsInRole("Administrator");
 }
-
 <h1>@Model.Title</h1>
 <p>@Model.Description</p>
-<p class="text-muted">
-    Project tags: @(string.IsNullOrWhiteSpace(Model.ProjectTagsRaw) ? "(none - any project qualifies)" : Model.ProjectTagsRaw) | Max projects in CV: @Model.MaxProjectsInCv
-</p>
-<h3>Attributes on this position's CV template</h3>
-<table class="table">
-    <thead><tr><th>Name</th><th>Type</th><th>Required</th>@if (canManage) { <th></th> }</tr></thead>
-    <tbody>
-        @foreach (var pa in Model.Attributes.OrderBy(a => a.SortOrder))
+<ul class="nav nav-tabs mt-3" id="positionTabs">
+    <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#detailsTab" type="button">Details</button>
+    </li>
+    @if (User.Identity!.IsAuthenticated){
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#discussionTab" type="button">Discussion</button>
+        </li>
+    }
+</ul>
+<div class="tab-content mt-3">
+    <div class="tab-pane fade show active" id="detailsTab">
+        @if (User.IsInRole("Candidate"))
         {
-            <tr>
-                <td>@pa.AttributeDefinition.Name</td>
-                <td>@pa.AttributeDefinition.DataType</td>
-                <td>@(pa.IsRequired ? "Yes" : "No")</td>
-                @if (canManage)
-                {
-                    <td>
-                        <form asp-action="RemoveAttribute" method="post" class="d-inline">
-                            <input type="hidden" name="positionAttributeId" value="@pa.Id" />
-                            <input type="hidden" name="positionId" value="@Model.Id" />
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                        </form>
-                    </td>
-                }
-            </tr>
-        }
-    </tbody>
-</table>
-
-@if (canManage)
-{
-    <h4>Add attribute from library</h4>
-    <form asp-action="AddAttribute" method="post" class="row g-2">
-        <input type="hidden" name="positionId" value="@Model.Id" />
-        <div class="col-auto">
-            <select name="attributeDefinitionId" class="form-select" id="attrSelect"></select>
-        </div>
-        <div class="col-auto form-check mt-2">
-            <input type="checkbox" name="isRequired" value="true" class="form-check-input" id="isRequired" />
-            <label class="form-check-label" for="isRequired">Required</label>
-        </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Add</button>
-        </div>
-    </form>
-    <script>
-        fetch('/Attributes/ListJson').then(r => r.json()).then(data => {
-            const select = document.getElementById('attrSelect');
-
-            if (data.recentlyUsed.length > 0) {
-                const recentGroup = document.createElement('optgroup');
-                recentGroup.label = 'Recently Used';
-                data.recentlyUsed.forEach(a => {
-                    const opt = document.createElement('option');
-                    opt.value = a.id;
-                    opt.textContent = `${a.name} (${a.dataType})`;
-                    recentGroup.appendChild(opt);
-                });
-                select.appendChild(recentGroup);
+            bool hasAccess = ViewBag.CandidateHasAccess;
+            @if (hasAccess)
+            {
+                <form asp-controller="Cv" asp-action="Generate" method="post" class="mb-3">
+                    <input type="hidden" name="positionId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-success">Generate CV for this Position</button>
+                </form>
             }
-
-            const allGroup = document.createElement('optgroup');
-            allGroup.label = 'All Attributes';
-            data.all.forEach(a => {
-                const opt = document.createElement('option');
-                opt.value = a.id;
-                opt.textContent = `${a.name} (${a.dataType})`;
-                allGroup.appendChild(opt);
-            });
-            select.appendChild(allGroup);
-        });
-    </script>
-}
-
-@if (User.IsInRole("Recruiter") || User.IsInRole("Administrator")){
-    var cvs = (List<CV_mng_sys.Core.Entities.CvDocument>)ViewBag.Cvs;
-    <h4 class="mt-4">CVs submitted for this position</h4>
-    @if(!cvs.Any()){ <p class="text-muted">No CVs yet.</p>}
-    else {
-        <table class="table table-hover">
-            <thead><tr><th>Candidate</th><th>Status></th><th>Created</th></tr></thead>
+            else
+            {
+                var unmet = (List<string>)ViewBag.UnmetAttributes;
+                <div class="alert alert-warning">
+                    You don't currently meet this position's access requirements. 
+                    @if (unmet.Any())
+                    {
+                        <span>The following attributes don't meet this position's access criteria: <strong>@string.Join(", ", unmet)</strong>.</span>
+                    }
+                </div>
+            }
+        }
+        <p class="text-muted">
+            Project tags: @(string.IsNullOrWhiteSpace(Model.ProjectTagsRaw) ? "(none - any project qualifies)" : Model.ProjectTagsRaw) | Max projects in CV: @Model.MaxProjectsInCv
+        </p>
+        <h3>Attributes on this position's CV template</h3>
+        <table class="table">
+            <thead><tr><th>Name</th><th>Type</th><th>Required</th>@if (canManage) { <th></th> }</tr></thead>
             <tbody>
-                @foreach(var cv in cvs){
-                    <tr style="cursor:pointer" onclick="window.location='/Cv/Details/@cv.Id'">
-                        <td>@cv.CandidateUser.Email</td>
-                        <td><span class="badge @(cv.Status==CV_mng_sys.Core.Entities.CvStatus.Published ? "bg-success" : "bg-secondary")">@cv.Status</span></td>
-                        <td>@cv.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+                @foreach (var pa in Model.Attributes.OrderBy(a => a.SortOrder))
+                {
+                    <tr>
+                        <td>@pa.AttributeDefinition.Name</td>
+                        <td>@pa.AttributeDefinition.DataType</td>
+                        <td>@(pa.IsRequired ? "Yes" : "No")</td>
+                        @if (canManage)
+                        {
+                            <td>
+                                <form asp-action="RemoveAttribute" method="post" class="d-inline">
+                                    <input type="hidden" name="positionAttributeId" value="@pa.Id" />
+                                    <input type="hidden" name="positionId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>
         </table>
-    }
-}
 
-@if (User.IsInRole("Recruiter") || User.IsInRole("Administrator"))
-{
-    <h4 class="mt-4">Access Rules</h4>
-    <p class="text-muted small">No rules = public to all Candidates. All rules must pass for a Candidate to gain access.</p>
-    <div id="accessRulesList"></div>
-    <button id="btnAddRule" class="btn btn-sm btn-outline-primary">+ Add Rule</button>
-    <button id="btnSaveRules" class="btn btn-sm btn-success">Save Access Rules</button>
-    <div id="rulesError" class="alert alert-danger d-none mt-2"></div>
+        @if (canManage)
+        {
+            <h4>Add attribute from library</h4>
+            <form asp-action="AddAttribute" method="post" class="row g-2">
+                <input type="hidden" name="positionId" value="@Model.Id" />
+                <div class="col-auto">
+                    <select name="attributeDefinitionId" class="form-select" id="attrSelect"></select>
+                </div>
+                <div class="col-auto form-check mt-2">
+                    <input type="checkbox" name="isRequired" value="true" class="form-check-input" id="isRequired" />
+                    <label class="form-check-label" for="isRequired">Required</label>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+            <script>
+                fetch('/Attributes/ListJson').then(r => r.json()).then(data => {
+                    const select = document.getElementById('attrSelect');
 
-    <template id="ruleRowTemplate">
-        <div class="row g-2 mb-2 rule-row align-items-center">
-            <div class="col-3">
-                <select class="form-select form-select-sm rule-attribute"></select>
-            </div>
-            <div class="col-3">
-                <select class="form-select form-select-sm rule-operator">
-                    <option value="0">&gt;</option>
-                    <option value="1">&lt;</option>
-                    <option value="2">&gt;=</option>
-                    <option value="3">&lt;=</option>
-                    <option value="4">=</option>
-                    <option value="5">is checked</option>
-                    <option value="6">is unchecked</option>
-                    <option value="7">contains</option>
-                </select>
-            </div>
-            <div class="col-4">
-                <input type="text" class="form-control form-control-sm rule-value" placeholder="Value" />
-            </div>
-            <div class="col-2">
-                <button type="button" class="btn btn-sm btn-outline-danger btn-remove-rule">Remove</button>
-            </div>
+                    if (data.recentlyUsed.length > 0) {
+                        const recentGroup = document.createElement('optgroup');
+                        recentGroup.label = 'Recently Used';
+                        data.recentlyUsed.forEach(a => {
+                            const opt = document.createElement('option');
+                            opt.value = a.id;
+                            opt.textContent = `${a.name} (${a.dataType})`;
+                            recentGroup.appendChild(opt);
+                        });
+                        select.appendChild(recentGroup);
+                    }
+
+                    const allGroup = document.createElement('optgroup');
+                    allGroup.label = 'All Attributes';
+                    data.all.forEach(a => {
+                        const opt = document.createElement('option');
+                        opt.value = a.id;
+                        opt.textContent = `${a.name} (${a.dataType})`;
+                        allGroup.appendChild(opt);
+                    });
+                    select.appendChild(allGroup);
+                });
+            </script>
+        }
+
+        @if (User.IsInRole("Recruiter") || User.IsInRole("Administrator")){
+            var cvs = (List<CV_mng_sys.Core.Entities.CvDocument>)ViewBag.Cvs;
+            <h4 class="mt-4">CVs submitted for this position</h4>
+            @if(!cvs.Any()){ <p class="text-muted">No CVs yet.</p>}
+            else {
+                <table class="table table-hover">
+                    <thead><tr><th>Candidate</th><th>Status></th><th>Created</th></tr></thead>
+                    <tbody>
+                        @foreach(var cv in cvs){
+                            <tr style="cursor:pointer" onclick="window.location='/Cv/Details/@cv.Id'">
+                                <td>@cv.CandidateUser.Email</td>
+                                <td><span class="badge @(cv.Status==CV_mng_sys.Core.Entities.CvStatus.Published ? "bg-success" : "bg-secondary")">@cv.Status</span></td>
+                                <td>@cv.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+
+        @if (User.IsInRole("Recruiter") || User.IsInRole("Administrator"))
+        {
+            <h4 class="mt-4">Access Rules</h4>
+            <p class="text-muted small">No rules = public to all Candidates. All rules must pass for a Candidate to gain access.</p>
+            <div id="accessRulesList"></div>
+            <button id="btnAddRule" class="btn btn-sm btn-outline-primary">+ Add Rule</button>
+            <button id="btnSaveRules" class="btn btn-sm btn-success">Save Access Rules</button>
+            <div id="rulesError" class="alert alert-danger d-none mt-2"></div>
+
+            <template id="ruleRowTemplate">
+                <div class="row g-2 mb-2 rule-row align-items-center">
+                    <div class="col-3">
+                        <select class="form-select form-select-sm rule-attribute"></select>
+                    </div>
+                    <div class="col-3">
+                        <select class="form-select form-select-sm rule-operator">
+                            <option value="0">&gt;</option>
+                            <option value="1">&lt;</option>
+                            <option value="2">&gt;=</option>
+                            <option value="3">&lt;=</option>
+                            <option value="4">=</option>
+                            <option value="5">is checked</option>
+                            <option value="6">is unchecked</option>
+                            <option value="7">contains</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <input type="text" class="form-control form-control-sm rule-value" placeholder="Value" />
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-rule">Remove</button>
+                    </div>
+                </div>
+            </template>
+        }
+    </div>
+
+    @if(User.Identity!.IsAuthenticated){
+        <div class="tab-pane fade" id="discussionTab">
+            <div id="discussionThread" class="mb-3" style="max-height: 500px; overflow-y: auto;"></div>
+            <form id="discussionForm">
+                <textarea id="discussionInput" class="form-control mb-2" rows="3" placeholder="Write a post (markdown supported)..."></textarea>
+                <button type="submit" class="btn btn-primary btn-sm">Post</button>
+            </form>
         </div>
-    </template>
-
-    @section Scripts {
-        <script>window.__positionId = @Model.Id;</script>
-        <script src="~/js/access-rules.js"></script>
     }
+</div>
+
+
+@section Scripts {
+    <script>window.__positionId = @Model.Id;</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script src="~/js/discussion.js"></script>
 }

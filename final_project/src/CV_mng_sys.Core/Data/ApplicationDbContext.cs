@@ -17,6 +17,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<CandidateAttributeValue> CandidateAttributeValues => Set<CandidateAttributeValue>();
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<PositionAccessRule> PositionAccessRules => Set<PositionAccessRule>();
+    public DbSet<DiscussionPost> DiscussionPosts => Set<DiscussionPost>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

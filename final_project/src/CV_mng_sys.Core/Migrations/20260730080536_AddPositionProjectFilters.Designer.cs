@@ -3,6 +3,7 @@ using System;
 using CV_mng_sys.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CV_mng_sys.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260730080536_AddPositionProjectFilters")]
+    partial class AddPositionProjectFilters
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,35 +246,6 @@ namespace CV_mng_sys.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Positions");
-                });
-
-            modelBuilder.Entity("CV_mng_sys.Core.Entities.PositionAccessRule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AttributeDefinitionId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ComparisonValue")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Operator")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PositionId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AttributeDefinitionId");
-
-                    b.HasIndex("PositionId");
-
-                    b.ToTable("PositionAccessRules");
                 });
 
             modelBuilder.Entity("CV_mng_sys.Core.Entities.PositionAttribute", b =>
@@ -512,25 +486,6 @@ namespace CV_mng_sys.Core.Migrations
                         .IsRequired();
 
                     b.Navigation("CandidateUser");
-
-                    b.Navigation("Position");
-                });
-
-            modelBuilder.Entity("CV_mng_sys.Core.Entities.PositionAccessRule", b =>
-                {
-                    b.HasOne("CV_mng_sys.Core.Entities.AttributeDefinition", "AttributeDefinition")
-                        .WithMany()
-                        .HasForeignKey("AttributeDefinitionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CV_mng_sys.Core.Entities.Position", "Position")
-                        .WithMany()
-                        .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AttributeDefinition");
 
                     b.Navigation("Position");
                 });

@@ -1,3 +1,4 @@
+@using CV_mng_sys.Core.Entities
 @model List<CV_mng_sys.Core.Entities.AttributeDefinition>
 @{
     ViewData["Title"] = "Attributes";
@@ -9,11 +10,19 @@
 <!-- toolbar -->
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div id="toolbar">
-        <button id="btnNew" class="btn btn-primary btn-sm">
-            <i class="bi-biPlus-lg"></i> Create New Attribute
-        </button>
+        <button id="btnNew" class="btn btn-primary btn-sm">Create New Attribute</button>
         <button id="btnEdit" class="btn btn-secondary btn-sm" disabled>Edit</button>
         <button id="btnDelete" class="btn btn-outline-danger btn-sm" disabled>Delete</button>
+    </div>
+    <div>
+        <input type="text" id="prefixSearch" class="form-control form-control-sm" placeholder="Search by name prefix..." style="width:220px;display:inline-block;" />
+        <select id="categoryFilter" class="form-select form-select-sm" style="width:180px;display:inline-block;">
+            <option value="">All categories</option>
+            @foreach (var cat in Enum.GetValues<CV_mng_sys.Core.Entities.AttributeCategory>())
+            {
+                <option value="@cat">@cat.ToDisplayName()</option>
+            }
+        </select>
     </div>
 </div>
 
@@ -22,17 +31,22 @@
         <tr>
             <th style="width: 40px;"></th>
             <th>Name</th>
+            <th>Category</th>
             <th>Type</th>
+            <th>Description</th>
             <th>Options</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var attribute1 in Model)
         {
-            <tr data-id="@attribute1.Id" data-version="@attribute1.Version" data-name="@attribute1.Name" data-datatype="@((int)attribute1.DataType)" data-options="@attribute1.DropdownOptionsRaw" class="attribute-row" style="cursor: pointer;">
+            <tr data-id="@attribute1.Id" data-version="@attribute1.Version" data-name="@attribute1.Name" data-category="@((int)attribute1.Category)" data-description="@attribute1.Description" data-datatype="@((int)attribute1.DataType)" data-options="@attribute1.DropdownOptionsRaw" data-builtin="@attribute1.IsBuiltIn.ToString().ToLower()" 
+                class="attribute-row" data-category-name="@attribute1.Category" data-name-lower="@attribute1.Name.ToLower()" style="cursor: pointer;">
                 <td><input type="radio" name="selectedAttribute" class="form-check-input row-select" /></td>
-                <td>@attribute1.Name</td>
+                <td>@attribute1.Name @(attribute1.IsBuiltIn ? "🔒" : "")</td>
+                <td>@attribute1.Category.ToDisplayName()</td>
                 <td>@attribute1.DataType</td>
+                <td class="text-muted small">@attribute1.Description</td>
                 <td>@attribute1.DropdownOptionsRaw</td>
             </tr>
         }
@@ -56,13 +70,28 @@
                     <input type="text" class="form-control" id="attributeName" />
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select id="attributeCategory" class="form-select">
+                        @foreach(var cat in Enum.GetValues<CV_mng_sys.Core.Entities.AttributeCategory>()){
+                            <option value = "@((int)cat)">@cat.ToDisplayName()</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea id="attributeDescription" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Data Type</label>
                     <select class="form-select" id="attributeDataType">
-                        <option value="0">Text</option>
-                        <option value="1">Number</option>
-                        <option value="2">Dropdown</option>
-                        <option value="3">Checkbox</option>
+                        <option value="0">String (single-line text)</option>
+                        <option value="1">Text</option>
+                        <option value="2">Image</option>
+                        <option value="3">Numeric</option>
                         <option value="4">Date</option>
+                        <option value="5">Period (date range)</option>
+                        <option value="6">Boolean (checkbox)</option>
+                        <option value="7">Dropdown (one of many)</option>
                     </select>
                 </div>
                 <div class="mb-3 d-none" id="dropdownOptionsGroup">

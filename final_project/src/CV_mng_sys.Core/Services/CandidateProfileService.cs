@@ -43,7 +43,7 @@ public class CandidateProfileService
                     if (!DateOnly.TryParse(value, out _))
                         return (false, "Value must be a valid date (YYYY-MM-DD).", 0);
                     break;
-                case AttributeDataType.Checkbox:
+                case AttributeDataType.Boolean:
                     if (value != "true" && value != "false")
                         return (false, "Checkbox value must be true or false.", 0);
                     break;

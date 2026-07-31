@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CV_mng_sys.Core.Services;
 using CV_mng_sys.Core.Entities;
+using System.ComponentModel;
 
 namespace CV_mng_sys.Web.Controllers;
 
@@ -24,28 +25,28 @@ public class AttributesController : Controller
 
     // Post: Attributes/Create
     [HttpPost]
-    public async Task<IActionResult> Create(string name, AttributeDataType dataType, string? dropdownOptionsRaw)
+    public async Task<IActionResult> Create(string name, AttributeCategory category, string? description, AttributeDataType dataType, string? dropdownOptionsRaw)
     {
         if (string.IsNullOrWhiteSpace(name))
             return BadRequest(new { error = "Name is required." });
 
-            var created = await _service.CreateAsync(name, dataType, dropdownOptionsRaw);
-            return Ok(new { created.Id, created.Name, DataType = created.DataType.ToString(), created.Version });
+            var (success, error, created) = await _service.CreateAsync(name, category, description, dataType, dropdownOptionsRaw);
+            if (!success) return BadRequest(new { error });
+            return Ok(new { created!.Id, created.Name, DataType = created.DataType.ToString(), created.Version });
     }
 
     // Post: Attributes/Update
     [HttpPost]
-    public async Task<IActionResult> Update(int id, string name, AttributeDataType dataType, string? dropdownOptionsRaw, uint expectedVersion)
+    public async Task<IActionResult> Update(int id, string name, AttributeCategory category, string? description, AttributeDataType dataType, string? dropdownOptionsRaw, uint expectedVersion)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return BadRequest(new { error = "Name is required." });
-
-        var (success, error) = await _service.UpdateAsync(id, name, dataType, dropdownOptionsRaw, expectedVersion);
-        if (!success)
-            return Conflict(new { error });
-
+        var (success, error) = await _service.UpdateAsync(id, name, category, description, dataType, dropdownOptionsRaw, expectedVersion);
+        if(!success)
+        {
+            bool isConflict = error == "This attribute was modified by someone else. Please reload and try again.";
+            return isConflict ? Conflict(new { error }) : BadRequest(new { error });
+        }
         var updated = await _service.GetByIdAsync(id);
-        return Ok(new { updated!.Id, updated.Name, DataType = updated!.DataType.ToString(), updated!.Version });
+        return Ok(new { updated!.Id, updated.Name, Category=updated.Category.ToString(), DataType = updated!.DataType.ToString(), updated!.Version });
     }
 
     // Post: Attributes/Delete
@@ -54,16 +55,24 @@ public class AttributesController : Controller
     {
         var (success, error) = await _service.DeleteAsync(id, expectedVersion);
         if (!success)
-            return Conflict(new { error });
-
-        return Ok(new { message = "Attribute definition deleted successfully." });
-    }
+        {
+            bool isConflict = error == "This attribute was modified by someone else. Please reload and try again.";
+            return isConflict ? Conflict(new { error }) : BadRequest(new { error });
+        }
+        return Ok();
+    }   
 
     [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> ListJson()
     {
-        var attrs = await _service.GetAllAsync();
-        return Ok(attrs.Select(a => new { a.Id, a.Name, DataType = a.DataType.ToString() }));
+        var all = await _service.GetAllAsync();
+        var recent = await _service.GetRecentlyUsedAsync(5);
+        var recentIds = recent.Select(r=>r.Id).ToHashSet();
+
+        return Ok(new {
+            recentlyUsed = recent.Select(a => new { a.Id, a.Name, DataType = a.DataType.ToString() }),
+            all = all.Select(a => new { a.Id, a.Name, DataType = a.DataType.ToString(), a.Category, IsRecent = recentIds.Contains(a.Id) })
+        });
     }
 }

@@ -3,6 +3,7 @@ using System;
 using CV_mng_sys.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CV_mng_sys.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260730051425_ExtendAttributeDefinitions")]
+    partial class ExtendAttributeDefinitions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,9 +112,6 @@ namespace CV_mng_sys.Core.Migrations
 
                     b.Property<bool>("IsBuiltIn")
                         .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastUsedUtc")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -214,7 +214,7 @@ namespace CV_mng_sys.Core.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAtUtc")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -222,12 +222,6 @@ namespace CV_mng_sys.Core.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("MaxProjectsInCv")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ProjectTagsRaw")
-                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -243,35 +237,6 @@ namespace CV_mng_sys.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Positions");
-                });
-
-            modelBuilder.Entity("CV_mng_sys.Core.Entities.PositionAccessRule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AttributeDefinitionId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ComparisonValue")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Operator")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PositionId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AttributeDefinitionId");
-
-                    b.HasIndex("PositionId");
-
-                    b.ToTable("PositionAccessRules");
                 });
 
             modelBuilder.Entity("CV_mng_sys.Core.Entities.PositionAttribute", b =>
@@ -302,48 +267,6 @@ namespace CV_mng_sys.Core.Migrations
                         .IsUnique();
 
                     b.ToTable("PositionAttributes");
-                });
-
-            modelBuilder.Entity("CV_mng_sys.Core.Entities.Project", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CandidateUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("DescriptionMarkdown")
-                        .HasColumnType("text");
-
-                    b.Property<DateOnly?>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateOnly?>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("TagsRaw")
-                        .HasColumnType("text");
-
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CandidateUserId");
-
-                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -516,25 +439,6 @@ namespace CV_mng_sys.Core.Migrations
                     b.Navigation("Position");
                 });
 
-            modelBuilder.Entity("CV_mng_sys.Core.Entities.PositionAccessRule", b =>
-                {
-                    b.HasOne("CV_mng_sys.Core.Entities.AttributeDefinition", "AttributeDefinition")
-                        .WithMany()
-                        .HasForeignKey("AttributeDefinitionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CV_mng_sys.Core.Entities.Position", "Position")
-                        .WithMany()
-                        .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AttributeDefinition");
-
-                    b.Navigation("Position");
-                });
-
             modelBuilder.Entity("CV_mng_sys.Core.Entities.PositionAttribute", b =>
                 {
                     b.HasOne("CV_mng_sys.Core.Entities.AttributeDefinition", "AttributeDefinition")
@@ -552,17 +456,6 @@ namespace CV_mng_sys.Core.Migrations
                     b.Navigation("AttributeDefinition");
 
                     b.Navigation("Position");
-                });
-
-            modelBuilder.Entity("CV_mng_sys.Core.Entities.Project", b =>
-                {
-                    b.HasOne("CV_mng_sys.Core.Entities.ApplicationUser", "CandidateUser")
-                        .WithMany()
-                        .HasForeignKey("CandidateUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CandidateUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

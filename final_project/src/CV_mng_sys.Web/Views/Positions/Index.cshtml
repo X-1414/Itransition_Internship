@@ -21,7 +21,7 @@
     <tbody>
         @foreach (var p in Model)
         {
-            <tr class="position-row" data-id="@p.Id" data-version="@p.Version" data-title="@p.Title" data-description="@p.Description" style="cursor:pointer;" onclick="window.location='/Positions/Details/@p.Id'">
+            <tr class="position-row" data-id="@p.Id" data-version="@p.Version" data-title="@p.Title" data-description="@p.Description" data-project-tags="@p.ProjectTagsRaw" data-max-projects="@p.MaxProjectsInCv" style="cursor:pointer;" onclick="window.location='/Positions/Details/@p.Id'">
                 @if (canManage)
                 {
                     <td onclick="event.stopPropagation()"><input type="radio" name="selectedPosition" class="form-check-input row-select" /></td>
@@ -57,6 +57,15 @@
                     <div class="mb-3">
                         <label class="form-label">Description</label>
                         <textarea id="posDescription" class="form-control"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Relevant Project Tags (comma-separated)</label>
+                        <input type="text" id="posProjectTags" class="form-control" placeholder="React, TypeScript" />
+                        <div class="form-text">Candidate projects tagged with any of these will be eligible for CVs generated for this position.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Max Projects Shown in Generated CV</label>
+                        <input type="number" id="posMaxProjects" class="form-control" min="0" value="3" />
                     </div>
                 </div>
                 <div class="modal-footer">

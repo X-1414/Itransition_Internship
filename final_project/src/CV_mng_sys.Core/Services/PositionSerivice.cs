@@ -12,15 +12,15 @@ public class PositionService
     public Task<Position?> GetByIdAsync(int id) =>
         _db.Positions.Include(p => p.Attributes).ThenInclude(pa => pa.AttributeDefinition).FirstOrDefaultAsync(p => p.Id == id);
 
-    public async Task<Position> CreateAsync(string title, string? description)
+    public async Task<Position> CreateAsync(string title, string? description, string? projectTagsRaw, int maxProjectsInCv)
     {
-        var entity = new Position { Title = title, Description = description };
+        var entity = new Position { Title = title, Description = description, ProjectTagsRaw = projectTagsRaw, MaxProjectsInCv = maxProjectsInCv};
         _db.Positions.Add(entity);
         await _db.SaveChangesAsync();
         return entity;
     }
 
-    public async Task<(bool Success, string? Error)> UpdateAsync(int id, string title, string? description, uint expectedVersion)
+    public async Task<(bool Success, string? Error)> UpdateAsync(int id, string title, string? description, string? projectTagsRaw, int maxProjectsInCv, uint expectedVersion)
     {
         var entity = await _db.Positions.FirstOrDefaultAsync(p => p.Id == id);
         if (entity is null) return (false, "Position not found.");
@@ -28,6 +28,8 @@ public class PositionService
         _db.Entry(entity).Property(e => e.Version).OriginalValue = expectedVersion;
         entity.Title = title;
         entity.Description = description;
+        entity.ProjectTagsRaw = projectTagsRaw;
+        entity.MaxProjectsInCv = maxProjectsInCv;
 
         try { await _db.SaveChangesAsync(); return (true, null); }
         catch (DbUpdateConcurrencyException) { return (false, "This position was modified by someone else. Please reload."); }
@@ -46,7 +48,7 @@ public class PositionService
     public async Task<Position> DuplicateAsync(int id)
     {
         var original = await GetByIdAsync(id) ?? throw new InvalidOperationException("Position not found.");
-        var copy = new Position { Title = original.Title + " (Copy)", Description = original.Description };
+        var copy = new Position { Title = original.Title + " (Copy)", Description = original.Description, ProjectTagsRaw = original.ProjectTagsRaw, MaxProjectsInCv = original.MaxProjectsInCv};
         _db.Positions.Add(copy);
         await _db.SaveChangesAsync();
 
@@ -76,6 +78,8 @@ public class PositionService
             IsRequired = isRequired,
             SortOrder = await _db.PositionAttributes.CountAsync(pa => pa.PositionId == positionId)
         });
+        var attribute = await _db.AttributeDefinitions.FindAsync(attributeDefinitionId);
+        if (attribute != null) attribute.LastUsedUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync();
     }
 
@@ -86,4 +90,82 @@ public class PositionService
     }
     
     public Task<int> GetActivePositionCountAsync() => _db.Positions.CountAsync(p => p.IsActive);
+
+    public async Task<bool> CandidateHasAccessAsync(int positionId, string candidateUserId)
+    {
+        var rules = await _db.PositionAccessRules.Include(r=>r.AttributeDefinition).Where(r=>r.PositionId == positionId).ToListAsync();
+        if (rules.Count == 0) return true;
+        var candidateValues = await _db.CandidateAttributeValues.Where(v=>v.CandidateUserId == candidateUserId).ToListAsync();
+        foreach (var rule in rules)
+        {
+            var value = candidateValues.FirstOrDefault(v=>v.AttributeDefinitionId == rule.AttributeDefinitionId)?.Value;
+            if(!EvaluateRule(rule, value)) return false;
+        }
+        return true;
+    }
+
+    private static bool EvaluateRule(PositionAccessRule rule, string? candidateValue)
+    {
+        switch (rule.Operator)
+        {
+            case AccessRuleOperator.IsChecked:
+                return candidateValue == "true";
+            case AccessRuleOperator.IsUnchecked:
+                return candidateValue != "true";
+            case AccessRuleOperator.Contains:
+                if(string.IsNullOrEmpty(candidateValue) || string.IsNullOrWhiteSpace(rule.ComparisonValue)) return false;
+                var candidates = rule.ComparisonValue.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                return candidates.Any(c=>candidateValue.Contains(c, StringComparison.OrdinalIgnoreCase));
+            case AccessRuleOperator.Equals:
+                return string.Equals(candidateValue, rule.ComparisonValue, StringComparison.OrdinalIgnoreCase);
+            case AccessRuleOperator.GreaterThan:
+            case AccessRuleOperator.LessThan:
+            case AccessRuleOperator.GreaterThanEqual:
+            case AccessRuleOperator.LessThanEqual:
+                if (!double.TryParse(candidateValue, out var candidateNum)) return false;
+                if (!double.TryParse(rule.ComparisonValue, out var ruleNum)) return false;
+                return rule.Operator switch
+                {
+                    AccessRuleOperator.GreaterThan => candidateNum > ruleNum,
+                    AccessRuleOperator.LessThan => candidateNum < ruleNum,
+                    AccessRuleOperator.GreaterThanEqual => candidateNum >= ruleNum,
+                    AccessRuleOperator.LessThanEqual => candidateNum <= ruleNum,
+                    _ => false
+                };
+            default:
+                return false;
+        }
+    }
+
+    public async Task<List<PositionAccessRule>> GetAccessRulesAsync(int positionId) => await _db.PositionAccessRules.Include(r=>r.AttributeDefinition).Where(r=>r.PositionId == positionId).ToListAsync();
+    public async Task SetAccessRulesAsync(int positionId, List<(int AttributeDefinitionId, AccessRuleOperator Operator, string? ComparisonValue)> rules)
+    {
+        var existing = await _db.PositionAccessRules.Where(r=>r.PositionId == positionId).ToListAsync();
+        _db.PositionAccessRules.RemoveRange(existing);
+        foreach(var(attrId, op, val) in rules)
+        {
+            _db.PositionAccessRules.Add(new PositionAccessRule
+            {
+                PositionId = positionId,
+                AttributeDefinitionId = attrId,
+                Operator = op,
+                ComparisonValue = val
+            });
+        }
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task<List<string>> GetUnmetRequirementAttributeNamesAsync(int positionId, string candidateUserId)
+    {
+        var rules = await _db.PositionAccessRules.Include(r=>r.AttributeDefinition).Where(r=>r.PositionId == positionId).ToListAsync();
+        if (rules.Count == 0) return new List<string>();
+        var candidateValues = await _db.CandidateAttributeValues.Where(v=>v.CandidateUserId == candidateUserId).ToListAsync();
+        var unmet = new List<string>();
+        foreach (var rule in rules)
+        {
+            var value = candidateValues.FirstOrDefault(v=>v.AttributeDefinitionId == rule.AttributeDefinitionId)?.Value;
+            if(!EvaluateRule(rule, value)) unmet.Add(rule.AttributeDefinition.Name);
+        }
+        return unmet;
+    }
 }

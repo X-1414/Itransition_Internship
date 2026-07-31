@@ -50,6 +50,12 @@
                                 <a class="nav-link" asp-controller="Cv" asp-action="MyCvs">My CVs</a>
                             </li>
                         }
+                        @if (User.IsInRole("Candidate"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Projects" asp-action="Index">My Projects</a>
+                            </li>
+                        }
                     </ul>
                     <button id="themeToggle" class="btn btn-outline-secondary btn-sm me-2" type="button" title="Toggle dark/light mode">
                         <span id="themeIcon">🌙</span>

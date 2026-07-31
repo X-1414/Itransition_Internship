@@ -25,7 +25,7 @@
                             }
                         </select>
                     }
-                    else if (def.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Checkbox)
+                    else if (def.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Boolean)
                     {
                         <input type="checkbox" class="form-check-input profile-value" checked="@(val?.Value == "true")" />
                     }

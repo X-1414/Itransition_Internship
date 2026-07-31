@@ -58,7 +58,7 @@
                             }
                         </select>
                     }
-                    else if (row.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Checkbox)
+                    else if (row.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Boolean)
                     {
                         <input type="checkbox" class="form-check-input cv-value" checked="@(row.Value == "true")" />
                     }
@@ -81,9 +81,42 @@
     </tbody>
 </table>
 
+@{
+    var projects = (List<CV_mng_sys.Core.Entities.Project>)ViewBag.Projects;
+}
+
+@if (projects.Any())
+{
+    <h3 class="mt-4">Relevant Projects</h3>
+    @foreach (var proj in projects)
+    {
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">
+                    @proj.Name
+                    <small class="text-muted">
+                        (@proj.StartDate?.ToString("yyyy-MM") - @(proj.EndDate?.ToString("yyyy-MM") ?? "Present"))
+                    </small>
+                </h5>
+                @foreach (var tag in proj.GetTags())
+                {
+                    <span class="badge bg-secondary me-1">@tag</span>
+                }
+                <div class="mt-2 markdown-body" data-markdown="@proj.DescriptionMarkdown"></div>
+            </div>
+        </div>
+    }
+}
+
 @if (isOwner)
 {
     @section Scripts {
         <script src="~/js/cv-details.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+        <script>
+            document.querySelectorAll('.markdown-body').forEach(el => {
+                el.innerHTML = marked.parse(el.dataset.markdown || '');
+            });
+        </script>
     }
 }

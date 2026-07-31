@@ -108,6 +108,11 @@ public class CvService
         catch (DbUpdateConcurrencyException) { return (false, "This CV was modified elsewhere. Please reload."); }
     }
 
+    public async Task<List<CvDocument>> GetAllForPositionAsync(int positionId)
+    {
+        return await _db.CvDocuments.Include(cv=>cv.CandidateUser).Where(cv=>cv.PositionId==positionId).ToListAsync();
+    }
+    
     public async Task<List<CvDocument>> GetPublishedForPositionAsync(int positionId)
     {
         return await _db.CvDocuments.Include(cv => cv.CandidateUser).Where(cv => cv.PositionId == positionId && cv.Status == CvStatus.Published).ToListAsync();
@@ -117,5 +122,26 @@ public class CvService
     {
         var cutoff = DateTime.UtcNow.AddDays(-days);
         return await _db.CvDocuments.CountAsync(cv => cv.CreatedAtUtc >= cutoff);
+    }
+
+    public async Task<List<Project>> GetFilteredProjectsAsync(int positionId, string candidateUserId)
+    {
+        var position = await _db.Positions.FirstOrDefaultAsync(p=>p.Id == positionId);
+        if (position is null) return new List<Project>();
+
+        var positionTags = position.GetProjectTags();
+        var candidateProjects = await _db.Projects.Where(p=>p.CandidateUserId == candidateUserId).OrderByDescending(p=>p.StartDate).ToListAsync();
+        var eligible = positionTags.Count == 0 ? candidateProjects : candidateProjects.Where(p=>p.GetTags().Any(t=>positionTags.Contains(t, StringComparer.OrdinalIgnoreCase))).ToList();
+        return eligible.Take(position.MaxProjectsInCv).ToList();
+    }
+
+    public async Task<Dictionary<int, bool>> GetAccessStatusForCvsAsync(List<CvDocument> cvs, PositionService positionService, string candidateUserId)
+    {
+        var result = new Dictionary<int, bool>();
+        foreach (var cv in cvs)
+        {
+            result[cv.Id] = await positionService.CandidateHasAccessAsync(cv.PositionId, candidateUserId);
+        }
+        return result;
     }
 }

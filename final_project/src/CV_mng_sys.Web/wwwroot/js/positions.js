@@ -24,6 +24,8 @@ btnNew.addEventListener('click', () => {
     document.getElementById('posVersion').value = '';
     document.getElementById('posTitle').value = '';
     document.getElementById('posDescription').value = '';
+    document.getElementById('posProjectTags').value = '';
+    document.getElementById('posMaxProjects').value = '3';
     document.getElementById('modalError').classList.add('d-none');
     modal.show();
 });
@@ -35,6 +37,8 @@ btnEdit.addEventListener('click', () => {
     document.getElementById('posVersion').value = selectedRow.dataset.version;
     document.getElementById('posTitle').value = selectedRow.dataset.title;
     document.getElementById('posDescription').value = selectedRow.dataset.description || '';
+    document.getElementById('posProjectTags').value = selectedRow.dataset.projectTags || '';
+    document.getElementById('posMaxProjects').value = selectedRow.dataset.maxProjects || '3';
     document.getElementById('modalError').classList.add('d-none');
     modal.show();
 });
@@ -44,11 +48,13 @@ btnSave.addEventListener('click', async () => {
     const version = document.getElementById('posVersion').value;
     const title = document.getElementById('posTitle').value;
     const description = document.getElementById('posDescription').value;
+    const projectTagsRaw = document.getElementById('posProjectTags').value;
+    const maxProjectsInCv = document.getElementById('posMaxProjects').value;
     const errorBox = document.getElementById('modalError');
 
     const isEdit = !!id;
     const url = isEdit ? '/Positions/Update' : '/Positions/Create';
-    const body = new URLSearchParams({ title, description });
+    const body = new URLSearchParams({ title, description, projectTagsRaw, maxProjectsInCv });
     if (isEdit) { body.append('id', id); body.append('expectedVersion', version); }
 
     const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });

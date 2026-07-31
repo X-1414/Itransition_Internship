@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using CV_mng_sys.Core.Entities;
 using CV_mng_sys.Core.Services;
+using AspNetCoreGeneratedDocument;
 
 namespace CV_mng_sys.Web.Controllers;
 
@@ -11,12 +12,14 @@ public class CvController : Controller
 {
     private readonly CvService _cvs;
     private readonly CandidateProfileService _profile;
+    private readonly PositionService _positions;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public CvController(CvService cvs, CandidateProfileService profile, UserManager<ApplicationUser> userManager)
+    public CvController(CvService cvs, CandidateProfileService profile, PositionService positions, UserManager<ApplicationUser> userManager)
     {
         _cvs = cvs;
         _profile = profile;
+        _positions = positions;
         _userManager = userManager;
     }
 
@@ -25,6 +28,7 @@ public class CvController : Controller
     {
         var userId = _userManager.GetUserId(User)!;
         var cvs = await _cvs.GetMyCvsAsync(userId);
+        ViewBag.AccessStatus = await _cvs.GetAccessStatusForCvsAsync(cvs, _positions, userId);
         return View(cvs);
     }
 
@@ -33,6 +37,8 @@ public class CvController : Controller
     public async Task<IActionResult> Generate(int positionId)
     {
         var userId = _userManager.GetUserId(User)!;
+        var hasAccess = await _positions.CandidateHasAccessAsync(positionId, userId);
+        if (!hasAccess) return Forbid();
         var cv = await _cvs.GetOrCreateAsync(userId, positionId);
         return RedirectToAction(nameof(Details), new { id = cv.Id });
     }
@@ -51,6 +57,7 @@ public class CvController : Controller
         ViewBag.IsOwner = isOwner || isAdmin; // Admin can edit like the owner
         ViewBag.CanPublish = await _cvs.CanPublishAsync(cv.PositionId, cv.CandidateUserId);
         ViewBag.Rows = await _cvs.GetAttributeRowsAsync(cv.PositionId, cv.CandidateUserId);
+        ViewBag.Projects = await _cvs.GetFilteredProjectsAsync(cv.PositionId, cv.CandidateUserId);
         return View(cv);
     }
 

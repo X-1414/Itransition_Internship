@@ -79,3 +79,21 @@ document.getElementById('btnUnpublish')?.addEventListener('click', async () => {
     if (response.status === 409) { const data = await response.json(); alert(data.error); return; }
     location.reload();
 });
+
+document.getElementById('btnLike')?.addEventListener('click', async (e) => {
+    const btn = e.target;
+    const likedCvId = btn.dataset.cvId;
+    const liked = btn.dataset.liked === 'true';
+    const url = liked ? '/Cv/Unlike' : '/Cv/Like';
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ id: likedCvId })
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    document.getElementById('likeCount').textContent = data.likeCount;
+    btn.dataset.liked = data.liked.toString();
+    btn.textContent = data.liked ? 'Liked' : 'Like';
+    btn.className = `btn btn-sm ${data.liked ? 'btn-danger' : 'btn-outline-danger'}`;
+});

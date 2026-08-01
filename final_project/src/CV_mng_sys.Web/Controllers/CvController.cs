@@ -58,6 +58,12 @@ public class CvController : Controller
         ViewBag.CanPublish = await _cvs.CanPublishAsync(cv.PositionId, cv.CandidateUserId);
         ViewBag.Rows = await _cvs.GetAttributeRowsAsync(cv.PositionId, cv.CandidateUserId);
         ViewBag.Projects = await _cvs.GetFilteredProjectsAsync(cv.PositionId, cv.CandidateUserId);
+        ViewBag.LikeCount = await _cvs.GetLikeCountAsync(id);
+        if (User.IsInRole("Recruiter"))
+        {
+            var recruiterId = _userManager.GetUserId(User)!;
+            ViewBag.HasLiked = await _cvs.HasLikedAsync(id, recruiterId);
+        }
         return View(cv);
     }
 
@@ -118,5 +124,25 @@ public class CvController : Controller
         var (success, error) = await _cvs.DeleteAsync(id, expectedVersion);
         if (!success) return Conflict(new { error });
         return Ok();
+    }
+
+    [Authorize(Roles = "Recruiter")]
+    [HttpPost]
+    public async Task<IActionResult> Like(int id)
+    {
+        var userId = _userManager.GetUserId(User)!;
+        await _cvs.LikeAsync(id, userId);
+        var count = await _cvs.GetLikeCountAsync(id);
+        return Ok(new {likeCount = count, liked = true});
+    }
+
+    [Authorize(Roles = "Recruiter")]
+    [HttpPost]
+    public async Task<IActionResult> Unlike(int id)
+    {
+        var userId = _userManager.GetUserId(User)!;
+        await _cvs.UnlikeAsync(id, userId);
+        var count = await _cvs.GetLikeCountAsync(id);
+        return Ok(new {likeCount = count, liked = false});
     }
 }

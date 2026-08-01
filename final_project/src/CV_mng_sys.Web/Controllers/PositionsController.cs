@@ -30,14 +30,18 @@ public class PositionsController : Controller
         if (position is null) return NotFound();
         if (User.IsInRole("Recruiter") || User.IsInRole("Administrator"))
         {
-            ViewBag.Cvs = User.IsInRole("Administrator") ? await _cvs.GetAllForPositionAsync(id) : await _cvs.GetPublishedForPositionAsync(id);
+            var cvs = User.IsInRole("Administrator") ? await _cvs.GetAllForPositionAsync(id) : await _cvs.GetPublishedForPositionAsync(id);
+            ViewBag.Cvs = cvs;
+            ViewBag.LikeCounts = await _cvs.GetLikeCountsAsync(cvs.Select(c => c.Id).ToList());
         }
+
         if (User.IsInRole("Candidate"))
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             ViewBag.CandidateHasAccess = await _positions.CandidateHasAccessAsync(id, userId);
             ViewBag.UnmetAttributes = await _positions.GetUnmetRequirementAttributeNamesAsync(id, userId);
         }
+
         return View(position);
     }
 

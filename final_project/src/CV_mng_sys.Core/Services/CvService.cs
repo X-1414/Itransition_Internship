@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using CV_mng_sys.Core.Data;
 using CV_mng_sys.Core.Entities;
+using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 
 namespace CV_mng_sys.Core.Services;
 
@@ -143,5 +145,29 @@ public class CvService
             result[cv.Id] = await positionService.CandidateHasAccessAsync(cv.PositionId, candidateUserId);
         }
         return result;
+    }
+
+    public Task<int> GetLikeCountAsync(int cvId) => _db.CvLikes.CountAsync(l=>l.CvDocumentId==cvId);
+    public Task<bool> HasLikedAsync(int cvId, string recruiterUserId) => _db.CvLikes.AnyAsync(l=>l.CvDocumentId==cvId && l.RecruiterUserId==recruiterUserId);
+    public async Task LikeAsync(int cvId, string recruiterUserId)
+    {
+        var exists = await _db.CvLikes.AnyAsync(l=>l.CvDocumentId==cvId && l.RecruiterUserId==recruiterUserId);
+        if (exists) return;
+        _db.CvLikes.Add(new CvLike {CvDocumentId = cvId, RecruiterUserId = recruiterUserId});
+        await _db.SaveChangesAsync();
+    }
+    public async Task UnlikeAsync(int cvId, string recruiterUserId)
+    {
+        var like = await _db.CvLikes.FirstOrDefaultAsync(l=>l.CvDocumentId==cvId && l.RecruiterUserId==recruiterUserId);
+        if (like != null)
+        {
+            _db.CvLikes.Remove(like);
+            await _db.SaveChangesAsync();
+        }
+    }
+
+    public async Task<Dictionary<int, int>> GetLikeCountsAsync(List<int> cvIds)
+    {
+        return await _db.CvLikes.Where(l=>cvIds.Contains(l.CvDocumentId)).GroupBy(l=>l.CvDocumentId).ToDictionaryAsync(g=>g.Key, g=>g.Count());
     }
 }

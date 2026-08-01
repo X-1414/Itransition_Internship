@@ -18,6 +18,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<PositionAccessRule> PositionAccessRules => Set<PositionAccessRule>();
     public DbSet<DiscussionPost> DiscussionPosts => Set<DiscussionPost>();
+    public DbSet<CvLike> CvLikes => Set<CvLike>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -31,6 +32,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<CvDocument>().HasIndex(cv => new { cv.PositionId, cv.CandidateUserId }).IsUnique();
         builder.Entity<CvDocument>().Property(c => c.Version).IsRowVersion();
         builder.Entity<Project>().Property(p=>p.Version).IsRowVersion();
+        builder.Entity<CvLike>().HasIndex(l=>new{l.CvDocumentId, l.RecruiterUserId}).IsUnique();
     }
     public DbSet<CvDocument> CvDocuments => Set<CvDocument>();
 }

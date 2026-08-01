@@ -1,0 +1,49 @@
+@model List<CV_mng_sys.Core.Services.UserSummary>
+@{
+    ViewData["Title"] = "User Management";
+    var allRoles = (string[])ViewBag.AllRoles;
+}
+
+<h1>User Management</h1>
+<div class="mb-3">
+    <button id="btnBlock" class="btn btn-outline-warning btn-sm" disabled>Block</button>
+    <button id="btnUnblock" class="btn btn-outline-secondary btn-sm" disabled>Unblock</button>
+    <button id="btnDelete" class="btn btn-outline-danger btn-sm" disabled>Delete</button>
+    <select id="roleSelect" class="form-select form-select-sm d-inline-block" style="width:180px;" disabled>
+        @foreach (var role in allRoles)
+        {
+            <option value="@role">@role</option>
+        }
+    </select>
+    <button id="btnAssignRole" class="btn btn-outline-primary btn-sm" disabled>Assign Role</button>
+    <button id="btnRemoveRole" class="btn btn-outline-secondary btn-sm" disabled>Remove Role</button>
+</div>
+<div id="actionError" class="alert alert-danger d-none"></div>
+
+<table class="table table-hover align-middle">
+    <thead><tr><th style="width:40px"></th><th>Email</th><th>Roles</th><th>Status</th></tr></thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr class="user-row" data-id="@u.Id" data-email="@u.Email" data-blocked="@u.IsBlocked.ToString().ToLower()" style="cursor:pointer;">
+                <td><input type="radio" name="selectedUser" class="form-check-input row-select" /></td>
+                <td>@u.Email</td>
+                <td>@string.Join(", ", u.Roles)</td>
+                <td>
+                    @if (u.IsBlocked)
+                    {
+                        <span class="badge bg-danger">Blocked</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="~/js/admin-users.js"></script>
+}

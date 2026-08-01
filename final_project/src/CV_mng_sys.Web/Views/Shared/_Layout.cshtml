@@ -56,6 +56,12 @@
                                 <a class="nav-link" asp-controller="Projects" asp-action="Index">My Projects</a>
                             </li>
                         }
+                        @if (User.IsInRole("Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Admin" asp-action="Users">User Management</a>
+                            </li>
+                        }
                     </ul>
                     <button id="themeToggle" class="btn btn-outline-secondary btn-sm me-2" type="button" title="Toggle dark/light mode">
                         <span id="themeIcon">🌙</span>

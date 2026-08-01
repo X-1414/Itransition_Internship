@@ -18,6 +18,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
         options.Password.RequireDigit = false;
+        options.Lockout.AllowedForNewUsers = true;
     }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
 builder.Services.AddScoped<CV_mng_sys.Core.Services.AttributeLibraryService>();
@@ -27,6 +28,8 @@ builder.Services.AddScoped<CV_mng_sys.Core.Services.CvService>();
 builder.Services.AddScoped<CV_mng_sys.Core.Services.ProjectService>();
 builder.Services.AddScoped<CV_mng_sys.Core.Services.DiscussionService>();
 builder.Services.AddScoped<CV_mng_sys.Core.Services.UserStatsService>();
+builder.Services.AddScoped<CV_mng_sys.Core.Services.UserManagementService>();
+builder.Services.ConfigureApplicationCookie(options =>{ options.AccessDeniedPath = "/Home/Index"; });
 
 var app = builder.Build();
 

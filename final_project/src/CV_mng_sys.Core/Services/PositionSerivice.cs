@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using CV_mng_sys.Core.Data;
 using CV_mng_sys.Core.Entities;
+using System.Security;
 
 namespace CV_mng_sys.Core.Services;
 
@@ -168,4 +169,7 @@ public class PositionService
         }
         return unmet;
     }
+
+    public Task<List<Position>> GetLatestAsync(int count=5) => _db.Positions.OrderByDescending(p => p.CreatedAtUtc).Take(count).ToListAsync();
+    public Task<int> GetTotalPositionCountAsync() => _db.Positions.CountAsync();
 }

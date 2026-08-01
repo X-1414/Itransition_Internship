@@ -1,5 +1,11 @@
-﻿@{
+﻿@using CV_mng_sys.Core.Entities;
+@using Microsoft.AspNetCore.DataProtection
+@{
     ViewData["Title"] = "Home";
+    var latest = (List<Position>)ViewBag.LatestPositions;
+    var popular = (List<(Position Position, int CvCount)>)ViewBag.MostPopularPositions;
+    var tagCloud = (Dictionary<string, int>)ViewBag.TagCloud;
+    bool isRecruiterOrAdmin = User.IsInRole("Recruiter") || User.IsInRole("Administrator");
 }
 
 <div class="px-4 py-5 text-center">
@@ -15,21 +21,81 @@
     }
 </div>
 
-<div class="row text-center mb-4">
-    <div class="col-md-6">
-        <div class="card">
+<div class="row text-center mb-4 g-3">
+    <div class="col-md-6 col-6">
+        <div class="card h-100">
             <div class="card-body">
                 <h2 class="display-6">@ViewBag.NewCvsLast24h</h2>
-                <p class="text-muted mb-0">New CVs created in the last 24 hours</p>
+                <p class="text-muted mb-0 small">New CVs created in the last 24 hours</p>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
+    <div class="col-md-6 col-6">
+        <div class="card h-100">
             <div class="card-body">
-                <h2 class="display-6">@ViewBag.ActivePositions</h2>
-                <p class="text-muted mb-0">Open positions</p>
+                <h2 class="display-6">@ViewBag.TotalPositions</h2>
+                <p class="text-muted mb-0 small">Total positions</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="display-6">@ViewBag.TotalCandidates</h2>
+                <p class="text-muted mb-0 small">Candidates</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="display-6">@ViewBag.TotalRecruiters</h2>
+                <p class="text-muted mb-0 small">Recruiters</p>
             </div>
         </div>
     </div>
 </div>
+
+<p class="text-center text-muted">Total CVs submitted: <strong>@ViewBag.TotalCvs</strong></p>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Latest Positions</h3>
+        <table class="table table-hover">
+            <thead><tr><th>Title</th><th>Created</th></tr></thead>
+            <tbody>
+                @foreach (var p in latest){
+                    <tr style="cursor:pointer" onclick="window.location='/Positions/Details/@p.Id'">
+                        <td>@p.Title</td>
+                        <td>@p.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h3>Most Popular Positions</h3>
+        <table class="table table-hover">
+            <thead><tr><th>Title</th><th>CVs Submitted</th></tr></thead>
+            <tbody>
+                @foreach (var(position, count) in popular){
+                    <tr style="cursor:pointer" onclick="window.location='/Positions/Details/@position.Id'">
+                        <td>@position.Title</td>
+                        <td>@count</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (tagCloud.Any()){
+    <h3 class="mt-4">Technology Tag Cloud</h3>
+    <p class="mb-4">
+        @foreach (var (tag, count) in tagCloud.OrderByDescending(t=>t.Value)){
+            var size = Math.Min(2.0, 0.85+count*0.15);
+            var href = isRecruiterOrAdmin ? $"/Search?q={Uri.EscapeDataString(tag)}" : $"/Positions?q={Uri.EscapeDataString(tag)}";
+            <a href="@href" class="me-2 text-decoration-none" style="font-size: @(size.ToString("0.00"))rem;">@tag</a>
+        }
+    </p>
+}

@@ -57,4 +57,10 @@ public class ProjectService
         var allTagsRaw = await _db.Projects.Where(p => p.TagsRaw != null).Select(p => p.TagsRaw!).ToListAsync();
         return allTagsRaw.SelectMany(raw => raw.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(t => t).ToList();
     }
+
+    public async Task<Dictionary<string, int>> GetTagCloudAsync()
+    {
+        var allTagsRaw = await _db.Projects.Where(p => p.TagsRaw != null).Select(p => p.TagsRaw!).ToListAsync();
+        return allTagsRaw.SelectMany(raw => raw.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)).GroupBy(t=>t, StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key, g => g.Count());
+    }
 }

@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using CV_mng_sys.Core.Data;
 using CV_mng_sys.Core.Entities;
-using System.Linq.Expressions;
-using Microsoft.Extensions.Logging;
 
 namespace CV_mng_sys.Core.Services;
 
@@ -170,4 +168,13 @@ public class CvService
     {
         return await _db.CvLikes.Where(l=>cvIds.Contains(l.CvDocumentId)).GroupBy(l=>l.CvDocumentId).ToDictionaryAsync(g=>g.Key, g=>g.Count());
     }
+
+    public async Task<List<(Position Position, int CvCount)>> GetMostPopPositionsAsync(int count=5)
+    {
+        var grouped = await _db.CvDocuments.GroupBy(cv => cv.PositionId).Select(g => new { PositionId = g.Key, Count = g.Count() }).OrderByDescending(g => g.Count).Take(count).ToListAsync();
+        var positionIds = grouped.Select(g=>g.PositionId).ToList();
+        var positions = await _db.Positions.Where(p=>positionIds.Contains(p.Id)).ToListAsync();
+        return grouped.Select(g => (positions.First(p => p.Id == g.PositionId), g.Count)).ToList();
+    }
+    public Task<int> GetTotalSubmittedCvCountAsync() => _db.CvDocuments.CountAsync();
 }

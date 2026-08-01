@@ -26,6 +26,7 @@ builder.Services.AddScoped<CV_mng_sys.Core.Services.CandidateProfileService>();
 builder.Services.AddScoped<CV_mng_sys.Core.Services.CvService>();
 builder.Services.AddScoped<CV_mng_sys.Core.Services.ProjectService>();
 builder.Services.AddScoped<CV_mng_sys.Core.Services.DiscussionService>();
+builder.Services.AddScoped<CV_mng_sys.Core.Services.UserStatsService>();
 
 var app = builder.Build();
 

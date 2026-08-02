@@ -14,7 +14,7 @@ async function saveRow(row) {
     const statusCell = row.querySelector('.save-status');
     let value = input.type === 'checkbox' ? String(input.checked) : input.value;
 
-    statusCell.textContent = 'Saving...';
+    statusCell.textContent = window.profileTexts.saving;
 
     const body = new URLSearchParams({
         attributeDefinitionId: attrId,
@@ -31,15 +31,15 @@ async function saveRow(row) {
 
         if (response.status === 409) {
             const data = await response.json();
-            statusCell.textContent = 'Conflict!';
+            statusCell.textContent = window.profileTexts.conflict;
             statusCell.classList.add('text-danger');
-            alert(data.error + ' Reloading...');
+            alert(data.error + ' ' + window.profileTexts.reloading);
             location.reload();
             return;
         }
 
         if (!response.ok) {
-            let msg = 'Error';
+            let msg = window.profileTexts.error;
             try { const data = await response.json(); if (data.error) msg = data.error; } catch {}
             statusCell.textContent = msg;
             statusCell.classList.add('text-danger');
@@ -48,11 +48,11 @@ async function saveRow(row) {
 
         const data = await response.json();
         row.dataset.version = data.newVersion; // critical: update local version for next save
-        statusCell.textContent = 'Saved';
+        statusCell.textContent = window.profileTexts.saved;
         statusCell.classList.remove('text-danger');
         setTimeout(() => { statusCell.textContent = ''; }, 2000);
     } catch (err) {
-        statusCell.textContent = 'Network error';
+        statusCell.textContent = window.profileTexts.networkError;
         statusCell.classList.add('text-danger');
     }
 }

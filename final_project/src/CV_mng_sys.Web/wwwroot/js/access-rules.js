@@ -14,7 +14,7 @@ function addRuleRow(attributeDefinitionId, operatorValue, comparisonValue){
     attributeOptions.forEach(a=>{
         const opt = document.createElement('option');
         opt.value = a.id;
-        opt.textContent = `${a.name} (${a.dataType})`;
+        opt.textContent = `${a.name} (${a.dataTypeDisplay})`;
         select.appendChild(opt);
     });
     if (attributeDefinitionId) select.value = attributeDefinitionId;

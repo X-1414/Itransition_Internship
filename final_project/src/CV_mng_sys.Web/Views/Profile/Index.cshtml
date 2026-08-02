@@ -1,19 +1,21 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<CV_mng_sys.Web.SharedResource> Localizer
 @model List<(CV_mng_sys.Core.Entities.AttributeDefinition Definition, CV_mng_sys.Core.Entities.CandidateAttributeValue? Value)>
 @{
-    ViewData["Title"] = "My Profile - Info";
+    ViewData["Title"] = $"{Localizer["MyProfile"]} - {Localizer["Info"]}";
 }
 
-<h1>My Profile</h1>
-<p class="text-muted">Fill in values here once - they'll auto-populate any CV you generate for a matching position.</p>
+<h1>@Localizer["MyProfile"]</h1>
+<p class="text-muted">@Localizer["FillInValues"]</p>
 
 <table class="table align-middle">
-    <thead><tr><th>Attribute</th><th>Type</th><th>Value</th><th style="width:80px;">Status</th></tr></thead>
+    <thead><tr><th>@Localizer["Attribute"]</th><th>@Localizer["Type"]</th><th>@Localizer["Value"]</th><th style="width:80px;">@Localizer["Status"]</th></tr></thead>
     <tbody>
         @foreach (var (def, val) in Model)
         {
             <tr data-attr-id="@def.Id" data-version="@(val?.Version ?? 0)">
                 <td>@def.Name</td>
-                <td>@def.DataType</td>
+                <td>@Localizer[def.DataType.ToString()]</td>
                 <td>
                     @if (def.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Dropdown)
                     {
@@ -31,15 +33,15 @@
                     }
                     else if (def.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Number)
                     {
-                        <input type="number" step="any" class="form-control form-control-sm profile-value" value="@val?.Value" placeholder="Any number (e.g. 3.9, 42)" />
+                        <input type="number" step="any" class="form-control form-control-sm profile-value" value="@val?.Value" placeholder="@Localizer["AnyNumberPlaceholder"]" />
                     }
                     else if (def.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Date)
                     {
-                        <input type="date" class="form-control form-control-sm profile-value" value="@val?.Value" placeholder="yyyy-mm-dd" />
+                        <input type="date" class="form-control form-control-sm profile-value" value="@val?.Value"/>
                     }
                     else
                     {
-                        <input type="text" class="form-control form-control-sm profile-value" placeholder="Free text" value="@val?.Value" />
+                        <input type="text" class="form-control form-control-sm profile-value" placeholder="@Localizer["FreeText"]" value="@val?.Value" />
                     }
                 </td>
                 <td class="save-status text-muted small"></td>
@@ -49,5 +51,15 @@
 </table>
 
 @section Scripts {
+     <script>
+        window.profileTexts = {
+            saving: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Saving"].Value)),
+            saved: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Saved"].Value)),
+            conflict: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Conflict"].Value)),
+            reloading: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Reloading"].Value)),
+            error: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Error"].Value)),
+            networkError: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["NetworkError"].Value))
+        };
+    </script>
     <script src="~/js/profile-autosave.js"></script>
 }

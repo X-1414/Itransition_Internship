@@ -1,3 +1,5 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<CV_mng_sys.Web.SharedResource> Localizer
 @model CV_mng_sys.Core.Entities.Position
 @{
     ViewData["Title"] = Model.Title;
@@ -7,11 +9,11 @@
 <p>@Model.Description</p>
 <ul class="nav nav-tabs mt-3" id="positionTabs">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#detailsTab" type="button">Details</button>
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#detailsTab" type="button">@Localizer["Details"]</button>
     </li>
     @if (User.Identity!.IsAuthenticated){
         <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#discussionTab" type="button">Discussion</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#discussionTab" type="button">@Localizer["Discussion"]</button>
         </li>
     }
 </ul>
@@ -24,7 +26,7 @@
             {
                 <form asp-controller="Cv" asp-action="Generate" method="post" class="mb-3">
                     <input type="hidden" name="positionId" value="@Model.Id" />
-                    <button type="submit" class="btn btn-success">Generate CV for this Position</button>
+                    <button type="submit" class="btn btn-success">@Localizer["GenerateCv"]</button>
                 </form>
             }
             else
@@ -33,31 +35,31 @@
                 <div class="alert alert-warning">
                     @if (unmet.Any())
                     {
-                        <span>The following attributes don't meet this position's access requirements: <strong>@string.Join(", ", unmet)</strong>.</span>
+                        <span>@Localizer["The following attributes don't meet this position's access requirements: "]<strong>@string.Join(", ", unmet)</strong>.</span>
                     }
                 </div>
             }
         }
         <p class="text-muted">
-            Project tags: @(string.IsNullOrWhiteSpace(Model.ProjectTagsRaw) ? "(none - any project qualifies)" : Model.ProjectTagsRaw) | Max projects in CV: @Model.MaxProjectsInCv
+            @Localizer["ProjectTags"]: @(string.IsNullOrWhiteSpace(Model.ProjectTagsRaw) ? @Localizer["(none - any project qualifies)"] : Model.ProjectTagsRaw) | @Localizer["MaxProjectsInCv"]: @Model.MaxProjectsInCv
         </p>
-        <h3>Attributes on this position's CV template</h3>
+        <h3>@Localizer["AttributesOnCvTemplate"]</h3>
         <table class="table">
-            <thead><tr><th>Name</th><th>Type</th><th>Required</th>@if (canManage) { <th></th> }</tr></thead>
+            <thead><tr><th>@Localizer["Name"]</th><th>@Localizer["Type"]</th><th>@Localizer["Required"]</th>@if (canManage) { <th></th> }</tr></thead>
             <tbody>
                 @foreach (var pa in Model.Attributes.OrderBy(a => a.SortOrder))
                 {
                     <tr>
                         <td>@pa.AttributeDefinition.Name</td>
-                        <td>@pa.AttributeDefinition.DataType</td>
-                        <td>@(pa.IsRequired ? "Yes" : "No")</td>
+                        <td>@Localizer[pa.AttributeDefinition.DataType.ToString()]</td>
+                        <td>@(pa.IsRequired ? Localizer["Yes"] : Localizer["No"])</td>
                         @if (canManage)
                         {
                             <td>
                                 <form asp-action="RemoveAttribute" method="post" class="d-inline">
                                     <input type="hidden" name="positionAttributeId" value="@pa.Id" />
                                     <input type="hidden" name="positionId" value="@Model.Id" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Remove"]</button>
                                 </form>
                             </td>
                         }
@@ -68,7 +70,7 @@
 
         @if (canManage)
         {
-            <h4>Add attribute from library</h4>
+            <h4>@Localizer["AddAttributeFromLibrary"]</h4>
             <form asp-action="AddAttribute" method="post" class="row g-2">
                 <input type="hidden" name="positionId" value="@Model.Id" />
                 <div class="col-auto">
@@ -76,34 +78,36 @@
                 </div>
                 <div class="col-auto form-check mt-2">
                     <input type="checkbox" name="isRequired" value="true" class="form-check-input" id="isRequired" />
-                    <label class="form-check-label" for="isRequired">Required</label>
+                    <label class="form-check-label" for="isRequired">@Localizer["Required"]</label>
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Add</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["Add"]</button>
                 </div>
             </form>
             <script>
                 fetch('/Attributes/ListJson').then(r => r.json()).then(data => {
                     const select = document.getElementById('attrSelect');
+                    const recentlyUsedText = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["RecentlyUsed"].Value));
+                    const allAttributesText = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["AllAttributes"].Value));
 
                     if (data.recentlyUsed.length > 0) {
                         const recentGroup = document.createElement('optgroup');
-                        recentGroup.label = 'Recently Used';
+                        recentGroup.label = recentlyUsedText;
                         data.recentlyUsed.forEach(a => {
                             const opt = document.createElement('option');
                             opt.value = a.id;
-                            opt.textContent = `${a.name} (${a.dataType})`;
+                            opt.textContent = `${a.name} (${a.dataTypeDisplay})`;
                             recentGroup.appendChild(opt);
                         });
                         select.appendChild(recentGroup);
                     }
 
                     const allGroup = document.createElement('optgroup');
-                    allGroup.label = 'All Attributes';
+                    allGroup.label = allAttributesText;
                     data.all.forEach(a => {
                         const opt = document.createElement('option');
                         opt.value = a.id;
-                        opt.textContent = `${a.name} (${a.dataType})`;
+                        opt.textContent = `${a.name} (${a.dataTypeDisplay})`;
                         allGroup.appendChild(opt);
                     });
                     select.appendChild(allGroup);
@@ -113,18 +117,18 @@
 
         @if (User.IsInRole("Recruiter") || User.IsInRole("Administrator")){
             var cvs = (List<CV_mng_sys.Core.Entities.CvDocument>)ViewBag.Cvs;
-            <h4 class="mt-4">CVs submitted for this position</h4>
-            @if(!cvs.Any()){ <p class="text-muted">No CVs yet.</p>}
+            <h4 class="mt-4">@Localizer["CVsSubmitted"]</h4>
+            @if(!cvs.Any()){ <p class="text-muted">@Localizer["NoCvsYet"]</p>}
             else {
                 <table class="table table-hover">
-                    <thead><tr><th>Candidate</th><th>Status</th><th>Likes</th><th>Created</th></tr></thead>
+                    <thead><tr><th>@Localizer["Candidate"]</th><th>@Localizer["Status"]</th><th>@Localizer["Likes"]</th><th>@Localizer["Created"]</th></tr></thead>
                     <tbody>
                         @foreach (var cv in cvs)
                         {
                             var likeCounts = (Dictionary<int, int>)ViewBag.LikeCounts;
                             <tr style="cursor:pointer" onclick="window.location='/Cv/Details/@cv.Id'">
                                 <td>@cv.CandidateUser.Email</td>
-                                <td><span class="badge @(cv.Status == CV_mng_sys.Core.Entities.CvStatus.Published ? "bg-success" : "bg-secondary")">@cv.Status</span></td>
+                                <td><span class="badge @(cv.Status == CV_mng_sys.Core.Entities.CvStatus.Published ? "bg-success" : "bg-secondary")">@Localizer[cv.Status.ToString()]</span></td>
                                 <td>👍 @(likeCounts.GetValueOrDefault(cv.Id, 0))</td>
                                 <td>@cv.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
                             </tr>
@@ -136,11 +140,11 @@
 
         @if (User.IsInRole("Recruiter") || User.IsInRole("Administrator"))
         {
-            <h4 class="mt-4">Access Rules</h4>
-            <p class="text-muted small">No rules = public to all Candidates. All rules must pass for a Candidate to gain access.</p>
+            <h4 class="mt-4">@Localizer["AccessRules"]</h4>
+            <p class="text-muted small">@Localizer["noRules"]</p>
             <div id="accessRulesList"></div>
-            <button id="btnAddRule" class="btn btn-sm btn-outline-primary">+ Add Rule</button>
-            <button id="btnSaveRules" class="btn btn-sm btn-success">Save Access Rules</button>
+            <button id="btnAddRule" class="btn btn-sm btn-outline-primary">@Localizer["AddRule"]</button>
+            <button id="btnSaveRules" class="btn btn-sm btn-success">@Localizer["SaveAccessRules"]</button>
             <div id="rulesError" class="alert alert-danger d-none mt-2"></div>
 
             <template id="ruleRowTemplate">
@@ -155,16 +159,16 @@
                             <option value="2">&gt;=</option>
                             <option value="3">&lt;=</option>
                             <option value="4">=</option>
-                            <option value="5">is checked</option>
-                            <option value="6">is unchecked</option>
-                            <option value="7">contains</option>
+                      <option value="5">@Localizer["IsChecked"]</option>
+                      <option value="6">@Localizer["IsUnchecked"]</option>
+                      <option value="7">@Localizer["Contains"]</option>
                         </select>
                     </div>
                     <div class="col-4">
-                        <input type="text" class="form-control form-control-sm rule-value" placeholder="Value" />
+                        <input type="text" class="form-control form-control-sm rule-value" placeholder="@Localizer["Value"]" />
                     </div>
                     <div class="col-2">
-                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-rule">Remove</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-rule">@Localizer["Remove"]</button>
                     </div>
                 </div>
             </template>
@@ -175,8 +179,8 @@
         <div class="tab-pane fade" id="discussionTab">
             <div id="discussionThread" class="mb-3" style="max-height: 500px; overflow-y: auto;"></div>
             <form id="discussionForm">
-                <textarea id="discussionInput" class="form-control mb-2" rows="3" placeholder="Write a post (markdown supported)..."></textarea>
-                <button type="submit" class="btn btn-primary btn-sm">Post</button>
+                <textarea id="discussionInput" class="form-control mb-2" rows="3" placeholder="@Localizer["WriteMarkdown"]"></textarea>
+                <button type="submit" class="btn btn-primary btn-sm">@Localizer["Post"]</button>
             </form>
         </div>
     }
@@ -187,4 +191,5 @@
     <script>window.__positionId = @Model.Id;</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
     <script src="~/js/discussion.js"></script>
+    <script src="~/js/access-rules.js"></script>
 }

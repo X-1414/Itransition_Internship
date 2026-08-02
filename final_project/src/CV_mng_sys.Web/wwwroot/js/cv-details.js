@@ -15,7 +15,7 @@ async function saveRow(row) {
     const statusCell = row.querySelector('.save-status');
     let value = input.type === 'checkbox' ? String(input.checked) : input.value;
 
-    statusCell.textContent = 'Saving...';
+    statusCell.textContent = window.cvTexts.saving;
 
     const body = new URLSearchParams({ cvId, attributeDefinitionId: attrId, value: value ?? '', expectedVersion: version });
 
@@ -28,7 +28,7 @@ async function saveRow(row) {
 
         if (response.status === 409) {
             const data = await response.json();
-            alert(data.error + ' Reloading...');
+            alert(`${data.error} ${window.cvTexts.reloading}`);
             location.reload();
             return;
         }
@@ -43,10 +43,10 @@ async function saveRow(row) {
         const data = await response.json();
         row.dataset.version = data.newVersion;
         row.classList.remove('table-danger'); 
-        statusCell.textContent = 'Saved';
+        statusCell.textContent = window.cvTexts.saved;
         setTimeout(() => location.reload(), 600); 
     } catch (err) {
-        statusCell.textContent = 'Network error';
+        statusCell.textContent = window.cvTexts.networkError;
         statusCell.classList.add('text-danger');
     }
 }
@@ -65,7 +65,7 @@ document.getElementById('btnPublish')?.addEventListener('click', async () => {
         body: new URLSearchParams({ id: cvId, expectedVersion: version })
     });
     if (response.status === 409) { const data = await response.json(); alert(data.error); return; }
-    if (!response.ok) { alert('Could not publish - check all required fields are filled.'); return; }
+    if (!response.ok) { alert(window.cvTexts.publishError); return; }
     location.reload();
 });
 
@@ -94,6 +94,6 @@ document.getElementById('btnLike')?.addEventListener('click', async (e) => {
     const data = await response.json();
     document.getElementById('likeCount').textContent = data.likeCount;
     btn.dataset.liked = data.liked.toString();
-    btn.textContent = data.liked ? 'Liked' : 'Like';
+    btn.textContent = data.liked ? window.cvTexts.liked : window.cvTexts.like;
     btn.className = `btn btn-sm ${data.liked ? 'btn-danger' : 'btn-outline-danger'}`;
 });

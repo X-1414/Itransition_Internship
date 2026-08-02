@@ -1,25 +1,31 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<CV_mng_sys.Web.SharedResource> Localizer
 @model List<CV_mng_sys.Core.Entities.CvDocument>
 @{
-    ViewData["Title"] = "My CVs";
+    ViewData["Title"] = @Localizer["MyCVs"];
     var accessStatus = (Dictionary<int, bool>)ViewBag.AccessStatus;
 }
 
-<h1>My CVs</h1>
+<h1>@Localizer["MyCVs"]</h1>
 <table class="table table-hover">
-    <thead><tr><th>Position</th><th>Status</th><th>Access</th><th>Created</th></tr></thead>
+    <thead><tr><th>@Localizer["Position"]</th><th>@Localizer["Status"]</th><th>@Localizer["Access"]</th><th>@Localizer["Created"]</th></tr></thead>
     <tbody>
         @foreach (var cv in Model)
         {
             bool hasAccess = accessStatus[cv.Id];
             <tr style="cursor:pointer" onclick="window.location='/Cv/Details/@cv.Id'">
                 <td>@cv.Position.Title</td>
-                <td><span class="badge @(cv.Status == CV_mng_sys.Core.Entities.CvStatus.Published ? "bg-success" : "bg-secondary")">@cv.Status</span></td>
+                <td><span class="badge @(cv.Status == CV_mng_sys.Core.Entities.CvStatus.Published ? "bg-success" : "bg-secondary")">@Localizer[cv.Status.ToString()]</span></td>
                 <td>
-                    @if (!hasAccess)
+                    @if (hasAccess)
                     {
-                        <span class="badge bg-warning text-dark">Access lost</span>
+                        <span class="badge bg-success">@Localizer["AccessAllowed"]</span>
+                    }
+                    else {
+                        <span class="badge bg-warning text-dark">@Localizer["AccessLost"]</span>
                     }
                 </td>
+                <td>@cv.CreatedAtUtc.ToString("d")</td>
             </tr>
         }
     </tbody>

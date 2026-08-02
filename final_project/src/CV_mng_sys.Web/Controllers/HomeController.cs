@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using CV_mng_sys.Core.Services;
+using Microsoft.AspNetCore.Localization;
 
 namespace CV_mng_sys.Web.Controllers;
 
@@ -34,4 +35,19 @@ public class HomeController : Controller
     }
 
     public IActionResult Privacy() => View();
+
+    [HttpPost]
+    public IActionResult SetLanguage(string culture, string returnUrl)
+    {
+        Response.Cookies.Append(
+            CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(new Microsoft.AspNetCore.Localization.RequestCulture(culture)),
+            new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+        );
+        if (string.IsNullOrWhiteSpace(returnUrl) || !Url.IsLocalUrl(returnUrl))
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        return LocalRedirect(returnUrl);
+    }
 }

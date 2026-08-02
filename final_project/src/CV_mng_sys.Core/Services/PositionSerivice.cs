@@ -172,4 +172,10 @@ public class PositionService
 
     public Task<List<Position>> GetLatestAsync(int count=5) => _db.Positions.OrderByDescending(p => p.CreatedAtUtc).Take(count).ToListAsync();
     public Task<int> GetTotalPositionCountAsync() => _db.Positions.CountAsync();
+
+    public async Task<List<Position>> SearchAsync(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query)) return new List<Position>();
+        return await _db.Positions.Where(p=>EF.Functions.ToTsVector("english", p.Title+" "+(p.Description ?? "")).Matches(EF.Functions.PlainToTsQuery("english", query))).ToListAsync();
+    }
 }

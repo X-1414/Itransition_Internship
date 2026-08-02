@@ -177,4 +177,12 @@ public class CvService
         return grouped.Select(g => (positions.First(p => p.Id == g.PositionId), g.Count)).ToList();
     }
     public Task<int> GetTotalSubmittedCvCountAsync() => _db.CvDocuments.CountAsync();
+
+    public async Task<List<CvDocument>> SearchAsync(string query, bool includeAllStatuses)
+    {
+        if (string.IsNullOrWhiteSpace(query)) return new List<CvDocument>();
+        var candidates = _db.CvDocuments.Include(cv=>cv.CandidateUser).Include(cv=>cv.Position).Where(cv=>EF.Functions.ToTsVector("english", cv.Position.Title + " " + cv.CandidateUser.Email).Matches(EF.Functions.PlainToTsQuery("english", query)));
+        if (!includeAllStatuses) candidates = candidates.Where(cv=>cv.Status == CvStatus.Published);
+        return await candidates.ToListAsync();
+    }
 }

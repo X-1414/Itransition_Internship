@@ -36,7 +36,7 @@ async function postAction(url, body) {
     });
     if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        errorBox.textContent = data.error || 'Action failed.';
+        errorBox.textContent = data.error || window.userTexts.actionFailed;
         errorBox.classList.remove('d-none');
         return false;
     }
@@ -52,7 +52,7 @@ btnUnblock.addEventListener('click', async () => {
 });
 
 btnDelete.addEventListener('click', async () => {
-    if (!confirm('Delete this user permanently? This cannot be undone.')) return;
+    if (!confirm(window.userTexts.confirmDelete)) return;
     if (await postAction('/Admin/Delete', new URLSearchParams({ userId: selectedUserId }))) location.reload();
 });
 
@@ -62,7 +62,9 @@ btnAssignRole.addEventListener('click', async () => {
 });
 
 btnRemoveRole.addEventListener('click', async () => {
-    const roleName = roleSelect.value;
-    if (!confirm(`Remove the "${roleName}" role from this user?`)) return;
-    if (await postAction('/Admin/RemoveRole', new URLSearchParams({ userId: selectedUserId, roleName }))) location.reload();
+    const roleValue = roleSelect.value;
+    const roleText = roleSelect.options[roleSelect.selectedIndex].text;
+    const message = window.userTexts.confirmRemoveRole.replace("{0}", roleText);
+    if (!confirm(message)) return;
+    if (await postAction('/Admin/RemoveRole', new URLSearchParams({ userId: selectedUserId, roleName: roleValue }))) location.reload();
 });

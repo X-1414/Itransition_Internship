@@ -1,0 +1,56 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<CV_mng_sys.Web.SharedResource> Localizer
+@{
+    ViewData["Title"] = Localizer["Search"];
+    var positions = (List<CV_mng_sys.Core.Entities.Position>)ViewBag.Positions;
+    var cvs = (List<CV_mng_sys.Core.Entities.CvDocument>)ViewBag.Cvs;
+    string query = ViewBag.Query;
+    bool canSeeCvs = User.IsInRole("Recruiter") || User.IsInRole("Administrator");
+}
+
+<h1>@string.Format(Localizer["SearchResultsFor"], query)</h1>
+<h3 class="mt-4">@Localizer["Positions"]</h3>
+@if (!positions.Any())
+{
+    <p class="text-muted">@Localizer["NoMatchingPositions"]</p>
+}
+else
+{
+    <table class="table table-hover">
+        <thead><tr><th>@Localizer["Title"]</th><th>@Localizer["Description"]</th></tr></thead>
+        <tbody>
+            @foreach (var p in positions)
+            {
+                <tr style="cursor:pointer" onclick="window.location='/Positions/Details/@p.Id'">
+                    <td>@p.Title</td>
+                    <td>@p.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (canSeeCvs)
+{
+    <h3 class="mt-4">@Localizer["MyCVs"]</h3>
+    @if (!cvs.Any())
+    {
+        <p class="text-muted">@Localizer["NoMatchingCVs"]</p>
+    }
+    else
+    {
+        <table class="table table-hover">
+            <thead><tr><th>@Localizer["Candidate"]</th><th>@Localizer["Positions"]</th><th>@Localizer["Status"]</th></tr></thead>
+            <tbody>
+                @foreach (var cv in cvs)
+                {
+                    <tr style="cursor:pointer" onclick="window.location='/Cv/Details/@cv.Id'">
+                        <td>@cv.CandidateUser.Email</td>
+                        <td>@cv.Position.Title</td>
+                        <td><span class="badge @(cv.Status == CV_mng_sys.Core.Entities.CvStatus.Published ? "bg-success" : "bg-secondary")">@Localizer[cv.Status.ToString()]</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}

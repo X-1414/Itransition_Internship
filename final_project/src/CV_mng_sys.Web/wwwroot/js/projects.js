@@ -75,7 +75,7 @@ const previewBox = document.getElementById('descriptionPreview');
 descriptionInput.addEventListener('input', ()=> { previewBox.innerHTML=marked.parse(descriptionInput.value || '');});
 
 btnNew.addEventListener('click', () => {
-    document.getElementById('modalTitle').textContent = 'New Project';
+    document.getElementById('modalTitle').textContent = window.projectTexts.newProject;
     document.getElementById('projId').value = '';
     document.getElementById('projVersion').value = '';
     document.getElementById('projName').value = '';
@@ -90,7 +90,7 @@ btnNew.addEventListener('click', () => {
 
 btnEdit.addEventListener('click', () => {
     if (!selectedRow) return;
-    document.getElementById('modalTitle').textContent = 'Edit Project';
+    document.getElementById('modalTitle').textContent = window.projectTexts.editProject;
     document.getElementById('projId').value = selectedRow.dataset.id;
     document.getElementById('projVersion').value = selectedRow.dataset.version;
     document.getElementById('projName').value = selectedRow.dataset.name;
@@ -128,25 +128,26 @@ btnSave.addEventListener('click', async () => {
         }
         if (!response.ok) {
             const data = await response.json().catch(() => ({}));
-            errorBox.textContent = data.error || 'Something went wrong.';
+            errorBox.textContent = data.error || window.projectTexts.somethingWentWrong;
             errorBox.classList.remove('d-none');
             return;
         }
         location.reload();
     } catch (err) {
-        errorBox.textContent = 'Network error: ' + err.message;
+        errorBox.textContent = `${window.projectTexts.networkError}: ${err.message}`;
         errorBox.classList.remove('d-none');
     }
 });
 
 btnDelete.addEventListener('click', async () => {
     if (!selectedRow) return;
-    if (!confirm(`Delete project "${selectedRow.dataset.name}"?`)) return;
+    const message = window.projectTexts.deleteConfirmation.replace("{0}", selectedRow.dataset.name);
+    if (!confirm(message)) return;
     const body = new URLSearchParams({ id: selectedRow.dataset.id, expectedVersion: selectedRow.dataset.version });
     const response = await fetch('/Projects/Delete', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
     if (response.status === 409 || !response.ok) {
         const data = await response.json().catch(() => ({}));
-        alert(data.error || 'Could not delete.');
+        alert(data.error || window.projectTexts.couldNotDelete);
         return;
     }
     location.reload();

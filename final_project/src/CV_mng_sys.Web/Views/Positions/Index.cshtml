@@ -1,23 +1,25 @@
+@using Microsoft.Extensions.Localization;
+@inject IStringLocalizer<CV_mng_sys.Web.SharedResource> Localizer
 @model List<CV_mng_sys.Core.Entities.Position>
 @{
     ViewData["Title"] = "Positions";
     bool canManage = User.IsInRole("Recruiter") || User.IsInRole("Administrator");
 }
 
-<h1>Positions</h1>
+<h1>@Localizer["Positions"]</h1>
 
 @if (canManage)
 {
     <div class="mb-3">
-        <button id="btnNew" class="btn btn-primary btn-sm">+ New Position</button>
-        <button id="btnEdit" class="btn btn-outline-secondary btn-sm" disabled>Edit</button>
-        <button id="btnDuplicate" class="btn btn-outline-secondary btn-sm" disabled>Duplicate</button>
-        <button id="btnDelete" class="btn btn-outline-danger btn-sm" disabled>Delete</button>
+        <button id="btnNew" class="btn btn-primary btn-sm">@Localizer["NewPosition"]</button>
+        <button id="btnEdit" class="btn btn-outline-secondary btn-sm" disabled>@Localizer["Edit"]</button>
+        <button id="btnDuplicate" class="btn btn-outline-secondary btn-sm" disabled>@Localizer["Duplicate"]</button>
+        <button id="btnDelete" class="btn btn-outline-danger btn-sm" disabled>@Localizer["Delete"]</button>
     </div>
 }
 
 <table class="table table-hover align-middle">
-    <thead><tr><th style="width:40px;"></th><th>Title</th><th>Description</th></tr></thead>
+    <thead><tr><th style="width:40px;"></th><th>@Localizer["Title"]</th><th>@Localizer["Description"]</th></tr></thead>
     <tbody>
         @foreach (var p in Model)
         {
@@ -43,7 +45,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">New Position</h5>
+                    <h5 class="modal-title" id="modalTitle">@Localizer["NewPosition"]</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -51,26 +53,26 @@
                     <input type="hidden" id="posId" />
                     <input type="hidden" id="posVersion" />
                     <div class="mb-3">
-                        <label class="form-label">Title</label>
+                        <label class="form-label">@Localizer["Title"]</label>
                         <input type="text" id="posTitle" class="form-control" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
+                        <label class="form-label">@Localizer["Description"]</label>
                         <textarea id="posDescription" class="form-control"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Relevant Project Tags (comma-separated)</label>
+                        <label class="form-label">@Localizer["RelevantProjectTags"]</label>
                         <input type="text" id="posProjectTags" class="form-control" placeholder="React, TypeScript" />
-                        <div class="form-text">Candidate projects tagged with any of these will be eligible for CVs generated for this position.</div>
+                        <div class="form-text">@Localizer["RelevantProjectTagsHelp"]</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Max Projects Shown in Generated CV</label>
+                        <label class="form-label">@Localizer["MaxProjectsInCv"]</label>
                         <input type="number" id="posMaxProjects" class="form-control" min="0" value="3" />
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="btnSave">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="button" class="btn btn-primary" id="btnSave">@Localizer["Save"]</button>
                 </div>
             </div>
         </div>

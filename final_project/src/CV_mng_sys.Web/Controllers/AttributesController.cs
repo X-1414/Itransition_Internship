@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using CV_mng_sys.Core.Services;
 using CV_mng_sys.Core.Entities;
 using System.ComponentModel;
@@ -10,10 +11,12 @@ namespace CV_mng_sys.Web.Controllers;
 public class AttributesController : Controller
 {
     private readonly AttributeLibraryService _service;
+    private readonly IStringLocalizer<SharedResource> _localizer;
 
-    public AttributesController(AttributeLibraryService service)
+    public AttributesController(AttributeLibraryService service, IStringLocalizer<CV_mng_sys.Web.SharedResource> localizer)
     {
         _service = service;
+        _localizer = localizer;
     }
 
     // Get: Attributes
@@ -71,8 +74,8 @@ public class AttributesController : Controller
         var recentIds = recent.Select(r=>r.Id).ToHashSet();
 
         return Ok(new {
-            recentlyUsed = recent.Select(a => new { a.Id, a.Name, DataType = a.DataType.ToString() }),
-            all = all.Select(a => new { a.Id, a.Name, DataType = a.DataType.ToString(), a.Category, IsRecent = recentIds.Contains(a.Id) })
+            recentlyUsed = recent.Select(a => new { id=a.Id, name=a.Name, dataType = a.DataType.ToString(), dataTypeDisplay = _localizer[a.DataType.ToString()].Value }),
+            all = all.Select(a => new { id=a.Id, name=a.Name, dataType = a.DataType.ToString(), dataTypeDisplay = _localizer[a.DataType.ToString()].Value, category=a.Category, IsRecent = recentIds.Contains(a.Id) })
         });
     }
 }

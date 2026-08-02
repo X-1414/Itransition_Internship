@@ -1,25 +1,27 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<CV_mng_sys.Web.SharedResource> Localizer
 @model CV_mng_sys.Core.Entities.CvDocument
 @{
-    ViewData["Title"] = "CV - " + Model.Position.Title;
+    ViewData["Title"] = $"{Localizer["CV"]} - {Model.Position.Title}";
     bool isOwner = ViewBag.IsOwner;
     bool canPublish = ViewBag.CanPublish;
     var rows = (List<CV_mng_sys.Core.Services.CvAttributeRow>)ViewBag.Rows;
 }
 
-<h1>CV: @Model.Position.Title</h1>
+<h1>@Localizer["CV"]: @Model.Position.Title</h1>
 <p>
     <span class="badge @(Model.Status == CV_mng_sys.Core.Entities.CvStatus.Published ? "bg-success" : "bg-secondary")">
-        @Model.Status
+        @Localizer[Model.Status.ToString()]
     </span>
     @if (!isOwner)
     {
-        <span class="text-muted">Candidate: @Model.CandidateUser.Email</span>
+        <span class="text-muted">@Localizer["Candidate"]: @Model.CandidateUser.Email</span>
     }
-    <span class="ms-3">👍 <span id="likeCount">@ViewBag.LikeCount</span> likes</span>
+    <span class="ms-3">👍 <span id="likeCount">@ViewBag.LikeCount</span> @Localizer["Likes"]
     @if (User.IsInRole("Recruiter")){
         bool hasLiked = ViewBag.HasLiked;
         <button id="btnLike" class="btn btn-sm @(hasLiked ? "btn-danger" : "btn-outline-danger")" data-cv-id="@Model.Id" data-liked="@hasLiked.ToString().ToLower()">
-            @(hasLiked ? "Liked" : "Like")
+            @(hasLiked ? @Localizer["Liked"] : @Localizer["Like"])
         </button>}
 </p>
 
@@ -28,21 +30,21 @@
     <div class="mb-3" id="cvActions" data-cv-id="@Model.Id" data-version="@Model.Version">
         @if (Model.Status == CV_mng_sys.Core.Entities.CvStatus.Draft)
         {
-            <button id="btnPublish" class="btn btn-success btn-sm" disabled="@(!canPublish)">Publish</button>
+            <button id="btnPublish" class="btn btn-success btn-sm" disabled="@(!canPublish)">@Localizer["Publish"]</button>
             @if (!canPublish)
             {
-                <span class="text-danger small ms-2">Fill in all required (*) fields to publish.</span>
+                <span class="text-danger small ms-2">@Localizer["Fill in all required (*) fields to publish."]</span>
             }
         }
         else
         {
-            <button id="btnUnpublish" class="btn btn-outline-secondary btn-sm">Unpublish (back to Draft)</button>
+            <button id="btnUnpublish" class="btn btn-outline-secondary btn-sm">@Localizer["Unpublish"]</button>
         }
     </div>
 }
 
 <table class="table align-middle">
-    <thead><tr><th>Attribute</th><th>Value</th><th style="width:80px;">Status</th></tr></thead>
+    <thead><tr><th>@Localizer["Attribute"]</th><th>@Localizer["Value"]</th><th style="width:80px;">@Localizer["Status"]</th></tr></thead>
     <tbody>
         @foreach (var row in rows)
         {
@@ -52,7 +54,7 @@
                 <td>
                     @if (!isOwner)
                     {
-                        @(isEmpty ? "(empty)" : row.Value)
+                        @(isEmpty ? @Localizer["Empty"] : row.Value)
                     }
                     else if (row.DataType == CV_mng_sys.Core.Entities.AttributeDataType.Dropdown)
                     {
@@ -93,7 +95,7 @@
 
 @if (projects.Any())
 {
-    <h3 class="mt-4">Relevant Projects</h3>
+    <h3 class="mt-4">@Localizer["RelevantProjects"]</h3>
     @foreach (var proj in projects)
     {
         <div class="card mb-2">
@@ -101,7 +103,7 @@
                 <h5 class="card-title">
                     @proj.Name
                     <small class="text-muted">
-                        (@proj.StartDate?.ToString("yyyy-MM") - @(proj.EndDate?.ToString("yyyy-MM") ?? "Present"))
+                        (@proj.StartDate?.ToString("yyyy-MM") - @(proj.EndDate?.ToString("yyyy-MM") ?? @Localizer["Present"]))
                     </small>
                 </h5>
                 @foreach (var tag in proj.GetTags())
@@ -116,6 +118,18 @@
 
 
 @section Scripts {
+    <script>
+        window.cvTexts = {
+            saved: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Saved"].Value)),
+            saving: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Saving"].Value)),
+            error: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Error"].Value)),
+            like: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Like"].Value)),
+            liked: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Liked"].Value)),
+            networkError: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["NetworkError"].Value)),
+            publishError: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["CouldNotPublish"].Value)),
+            reloading: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Reloading"].Value))
+        };
+    </script>
     <script src="~/js/cv-details.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
     <script>

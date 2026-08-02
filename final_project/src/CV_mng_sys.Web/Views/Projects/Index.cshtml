@@ -1,9 +1,16 @@
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<CV_mng_sys.Web.SharedResource> Localizer
 @model List<CV_mng_sys.Core.Entities.Project>
-@{ ViewData["Title"] = Localizer["MyProjects"]; }
+@{ 
+    ViewData["Title"] = Localizer["MyProjects"]; 
+    string? targetUserId = ViewBag.TargetUserId;
+}
 
 <h1>@Localizer["MyProjects"]</h1>
+@if (ViewBag.ViewingAsAdmin == true)
+{
+    <div class="alert alert-info">Viewing/editing projects for: <strong>@ViewBag.TargetEmail</strong> (as Administrator)</div>
+}
 <div class="mb-3">
     <button id="btnNew" class="btn btn-primary btn-sm">@Localizer["NewProject"]</button>
     <button id="btnEdit" class="btn btn-outline-secondary btn-sm" disabled>@Localizer["Edit"]</button>
@@ -87,6 +94,7 @@
             couldNotDelete: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["CouldNotDelete"].Value))
         };
     </script>
+    <script>window.__targetUserId = @Html.Raw(Json.Serialize(targetUserId));</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
     <script src="~/js/projects.js"></script>
 }

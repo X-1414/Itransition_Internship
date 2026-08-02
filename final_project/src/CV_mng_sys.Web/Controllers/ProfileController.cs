@@ -18,24 +18,37 @@ public class ProfileController : Controller
         _userManager = userManager;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? userId = null)
     {
-        var userId = _userManager.GetUserId(User)!;
-        var attributes = await _profile.GetProfileAttributesAsync(userId);
+        var currentUserId = _userManager.GetUserId(User)!;
+        var targetUserid = currentUserId;
+        if(!string.IsNullOrEmpty(userId) && userId != currentUserId)
+        {
+            if(!User.IsInRole("Administrator")) return Forbid();
+            var targetUser = await _userManager.FindByIdAsync(userId);
+            if (targetUser is null) return NotFound();
+            
+            targetUserid = userId;
+            ViewBag.ViewingAsAdmin = true;
+            ViewBag.TargetEmail = targetUser.Email;
+        }
+        var attributes = await _profile.GetProfileAttributesAsync(targetUserid);
+        ViewBag.TargetUserId = targetUserid;
         return View(attributes);
     }
 
     [HttpPost]
-    public async Task<IActionResult> SetValue(int attributeDefinitionId, string? value, uint expectedVersion)
+    public async Task<IActionResult> SetValue(int attributeDefinitionId, string? value, uint expectedVersion, string? userId = null)
     {
-        var userId = _userManager.GetUserId(User)!;
-        var (success, error, newVersion) = await _profile.SetValueAsync(userId, attributeDefinitionId, value, expectedVersion);
-        if (!success)
+        var currentUserId = _userManager.GetUserId(User)!;
+        var targetUserid = currentUserId;
+        if(!string.IsNullOrEmpty(userId) && userId != currentUserId)
         {
-            if (error == "This value was changed elsewhere. Please reload.")
-                return Conflict(new { error });
-            return BadRequest(new { error });
+            if(!User.IsInRole("Administrator")) return Forbid();
+            targetUserid = userId;
         }
+        var (success, error, newVersion) = await _profile.SetValueAsync(targetUserid, attributeDefinitionId, value, expectedVersion);
+        if (!success) return Conflict(new { error });
         return Ok(new { newVersion });
     }
 }

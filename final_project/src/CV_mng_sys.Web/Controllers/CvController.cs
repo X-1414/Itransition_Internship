@@ -126,7 +126,7 @@ public class CvController : Controller
         return Ok();
     }
 
-    [Authorize(Roles = "Recruiter")]
+    [Authorize(Roles = "Recruiter, Administrator")]
     [HttpPost]
     public async Task<IActionResult> Like(int id)
     {
@@ -136,7 +136,7 @@ public class CvController : Controller
         return Ok(new {likeCount = count, liked = true});
     }
 
-    [Authorize(Roles = "Recruiter")]
+    [Authorize(Roles = "Recruiter, Administrator")]
     [HttpPost]
     public async Task<IActionResult> Unlike(int id)
     {

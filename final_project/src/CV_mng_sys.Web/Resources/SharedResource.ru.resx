@@ -110,6 +110,11 @@
   <data name="Conflict" xml:space="preserve"><value>Конфликт!</value></data>
   <data name="Reloading" xml:space="preserve"><value>Перезарядка...</value></data>
   <data name="NetworkError" xml:space="preserve"><value>Ошибка сети</value></data>
+  <data name="Profile" xml:space="preserve"><value>Профиль</value></data>
+  <data name="PleaseChooseYourUsername" xml:space="preserve"><value>Пожалуйста, выберите имя пользователя.</value></data>
+  <data name="PleaseEnterYourPhoneNumber" xml:space="preserve"><value>Пожалуйста, введите номер вашего телефона.</value></data>
+  <data name="Username" xml:space="preserve"><value>Имя пользователя</value></data>
+  <data name="PhoneNumber" xml:space="preserve"><value>Номер телефона</value></data>
   <!-- projects -->
   <data name="NewProject" xml:space="preserve"><value>Новый проект</value></data>
   <data name="Period" xml:space="preserve"><value>Период</value></data>
@@ -151,6 +156,7 @@
   <data name="ActionFailed" xml:space="preserve"><value>Действие не удалось.</value></data>
   <data name="ConfirmDeleteUser" xml:space="preserve"><value>Удалить пользователя навсегда? Это действие необратимо.</value></data>
   <data name="ConfirmRemoveRole" xml:space="preserve"><value>Удалите роль "{0}" у этого пользователя?</value></data>
+  <data name="ViewAs" xml:space="preserve"><value>Просмотра от Имени</value></data>
   <!-- home -->
    <data name="BrowsePositions" xml:space="preserve"><value>Смотреть вакансии</value></data>
   <data name="LatestPositions" xml:space="preserve"><value>Последние вакансии</value></data>

@@ -6,6 +6,12 @@
 }
 
 <h1>@Localizer["MyProfile"]</h1>
+@{
+    string? targetUserId = ViewBag.TargetUserId;
+}
+@if (ViewBag.ViewingAsAdmin == true){
+    <div class="alert alert-info">Viewing/editing profile for: <strong>@ViewBag.TargetEmail</strong> (as Administrator)</div>
+}
 <p class="text-muted">@Localizer["FillInValues"]</p>
 
 <table class="table align-middle">
@@ -13,7 +19,7 @@
     <tbody>
         @foreach (var (def, val) in Model)
         {
-            <tr data-attr-id="@def.Id" data-version="@(val?.Version ?? 0)">
+            <tr data-attr-id="@def.Id" data-version="@(val?.Version ?? 0)" data-user-id="@targetUserId">
                 <td>@def.Name</td>
                 <td>@Localizer[def.DataType.ToString()]</td>
                 <td>

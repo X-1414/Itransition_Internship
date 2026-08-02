@@ -6,7 +6,7 @@ using CV_mng_sys.Core.Services;
 
 namespace CV_mng_sys.Web.Controllers;
 
-[Authorize(Roles = "Candidate")]
+[Authorize(Roles = "Candidate, Administrator")]
 public class ProjectsController : Controller
 {
     private readonly ProjectService _projects;
@@ -17,18 +17,36 @@ public class ProjectsController : Controller
         _projects = projects;
         _userManager = userManager;
     }
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? userId = null)
     {
-        var userId = _userManager.GetUserId(User)!;
-        return View(await _projects.GetForCandidateAsync(userId));
+        var currentUserId = _userManager.GetUserId(User)!;
+        var targetUserid = currentUserId;
+
+        if(!string.IsNullOrEmpty(userId) && userId != currentUserId)
+        {
+            if(!User.IsInRole("Administrator")) return Forbid();
+            var targetUser = await _userManager.FindByIdAsync(userId);
+            if (targetUser is null) return NotFound();
+            targetUserid = userId;
+            ViewBag.ViewingAsAdmin = true;
+            ViewBag.TargetEmail = targetUser.Email;
+        }
+        ViewBag.TargetUserId = targetUserid;
+        return View(await _projects.GetForCandidateAsync(targetUserid));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(string name, DateOnly? startDate, DateOnly? endDate, string? descriptionMarkdown, string? tagsRaw)
+    public async Task<IActionResult> Create(string name, DateOnly? startDate, DateOnly? endDate, string? descriptionMarkdown, string? tagsRaw, string? userId=null)
     {
         if (string.IsNullOrWhiteSpace(name)) return BadRequest(new {error = "Name is required."});
-        var userId = _userManager.GetUserId(User)!;
-        var created = await _projects.CreateAsync(userId, name, startDate, endDate, descriptionMarkdown, tagsRaw);
+        var currentUserId = _userManager.GetUserId(User)!;
+        var targetUserid = currentUserId;
+        if(!string.IsNullOrEmpty(userId) && userId != currentUserId)
+        {
+            if(!User.IsInRole("Administrator")) return Forbid();
+            targetUserid = userId;
+        }
+        var created = await _projects.CreateAsync(targetUserid, name, startDate, endDate, descriptionMarkdown, tagsRaw);
         return Ok(new {created.Id, created.Version});
     }
 
@@ -37,9 +55,9 @@ public class ProjectsController : Controller
     {
         var project = await _projects.GetByIdAsync(id);
         if (project is null) return NotFound();
-        var userId = _userManager.GetUserId(User);
-        if (project.CandidateUserId != userId && !User.IsInRole("Administrator")) return Forbid();
-
+        var currentUserId = _userManager.GetUserId(User)!;
+        if(project.CandidateUserId != currentUserId && !User.IsInRole("Administrator")) return Forbid();
+        
         var (success, error) = await _projects.UpdateAsync(id, name, startDate, endDate, descriptionMakrdown, tagsRaw, expectedVersion);
         if(!success) return Conflict (new { error });
         return Ok();
@@ -50,8 +68,8 @@ public class ProjectsController : Controller
     {
         var project = await _projects.GetByIdAsync(id);
         if (project is null) return NotFound();
-        var userId = _userManager.GetUserId(User);
-        if (project.CandidateUserId != userId && !User.IsInRole("Administrator")) return Forbid();
+        var currentUserId = _userManager.GetUserId(User);
+        if (project.CandidateUserId != currentUserId && !User.IsInRole("Administrator")) return Forbid();
 
         var (success, error) = await _projects.DeleteAsync(id, expectedVersion);
         if(!success) return Conflict (new { error });

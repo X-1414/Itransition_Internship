@@ -23,7 +23,7 @@
 <div id="actionError" class="alert alert-danger d-none"></div>
 
 <table class="table table-hover align-middle">
-    <thead><tr><th style="width:40px"></th><th>@Localizer["Email"]</th><th>@Localizer["Roles"]</th><th>@Localizer["Status"]</th></tr></thead>
+    <thead><tr><th style="width:40px"></th><th>@Localizer["Email"]</th><th>@Localizer["Roles"]</th><th>@Localizer["Status"]</th><th>@Localizer["ViewAs"]</th></tr></thead>
     <tbody>
         @foreach (var u in Model)
         {
@@ -39,6 +39,13 @@
                     else
                     {
                         <span class="badge bg-success">@Localizer["Active"]</span>
+                    }
+                </td>
+                <td>
+                    @if (u.Roles.Contains("Candidate"))
+                    {
+                        <a href="/Profile?userId=@u.Id" class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation()">@Localizer["Profile"]</a>
+                        <a href="/Projects?userId=@u.Id" class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation()">@Localizer["Projects"]</a>
                     }
                 </td>
             </tr>

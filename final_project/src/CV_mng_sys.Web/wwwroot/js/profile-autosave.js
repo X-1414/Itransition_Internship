@@ -10,6 +10,7 @@ function scheduleSave(row) {
 async function saveRow(row) {
     const attrId = row.dataset.attrId;
     const version = row.dataset.version;
+    const userId = row.dataset.userId;
     const input = row.querySelector('.profile-value');
     const statusCell = row.querySelector('.save-status');
     let value = input.type === 'checkbox' ? String(input.checked) : input.value;
@@ -19,7 +20,8 @@ async function saveRow(row) {
     const body = new URLSearchParams({
         attributeDefinitionId: attrId,
         value: value ?? '',
-        expectedVersion: version
+        expectedVersion: version,
+        userId: userId ?? ''
     });
 
     try {

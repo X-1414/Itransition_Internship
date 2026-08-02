@@ -117,6 +117,7 @@ btnSave.addEventListener('click', async () => {
     const url = isEdit ? '/Projects/Update' : '/Projects/Create';
     const body = new URLSearchParams({ name, startDate, endDate, tagsRaw, descriptionMarkdown });
     if (isEdit) { body.append('id', id); body.append('expectedVersion', version); }
+    else if (window.__targetUserId){ body.append('userId', window.__targetUserId); }
 
     try {
         const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });

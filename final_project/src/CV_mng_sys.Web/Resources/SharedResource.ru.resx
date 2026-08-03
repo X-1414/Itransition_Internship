@@ -115,7 +115,10 @@
   <data name="PleaseEnterYourPhoneNumber" xml:space="preserve"><value>Пожалуйста, введите номер вашего телефона.</value></data>
   <data name="Username" xml:space="preserve"><value>Имя пользователя</value></data>
   <data name="PhoneNumber" xml:space="preserve"><value>Номер телефона</value></data>
+  <data name="ViewingEditingProfileFor" xml:space="preserve"><value>Просмотр/редактирование профиля </value></data>
+  <data name="AsAdministrator" xml:space="preserve"><value> от имени Администратора</value></data>
   <!-- projects -->
+  <data name="Projects" xml:space="preserve"><value>Проекты</value></data>
   <data name="NewProject" xml:space="preserve"><value>Новый проект</value></data>
   <data name="Period" xml:space="preserve"><value>Период</value></data>
   <data name="Tags" xml:space="preserve"><value>Теги</value></data>

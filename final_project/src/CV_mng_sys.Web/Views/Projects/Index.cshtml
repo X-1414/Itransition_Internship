@@ -9,7 +9,7 @@
 <h1>@Localizer["MyProjects"]</h1>
 @if (ViewBag.ViewingAsAdmin == true)
 {
-    <div class="alert alert-info">Viewing/editing projects for: <strong>@ViewBag.TargetEmail</strong> (as Administrator)</div>
+    <div class="alert alert-info">@Localizer["ViewingEditingProfileFor"]<strong>@ViewBag.TargetEmail</strong>(@Localizer["AsAdministrator"])</div>
 }
 <div class="mb-3">
     <button id="btnNew" class="btn btn-primary btn-sm">@Localizer["NewProject"]</button>

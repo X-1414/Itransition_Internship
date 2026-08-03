@@ -10,7 +10,7 @@
     string? targetUserId = ViewBag.TargetUserId;
 }
 @if (ViewBag.ViewingAsAdmin == true){
-    <div class="alert alert-info">Viewing/editing profile for: <strong>@ViewBag.TargetEmail</strong> (as Administrator)</div>
+    <div class="alert alert-info">@Localizer["ViewingEditingProfileFor"]<strong>@ViewBag.TargetEmail</strong>(@Localizer["AsAdministrator"])</div>
 }
 <p class="text-muted">@Localizer["FillInValues"]</p>
 

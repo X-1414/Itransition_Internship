@@ -93,6 +93,7 @@
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2026 - @Localizer["CV Management System"] - <a asp-area="" asp-controller="Home" asp-action="Privacy">@Localizer["PrivacyPolicy"]</a>
+            · <a href="#" id="supportTicketLink" class="text-decoration-none">Create support ticket</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -100,5 +101,37 @@
     <script src="~/js/site.js"></script>
     <script src="~/js/theme-toggle.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <div class="modal fade" id="supportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Support Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="supportError" class="alert alert-danger d-none"></div>
+                    <div id="supportSuccess" class="alert alert-success d-none">Ticket submitted successfully!</div>
+                    <div class="mb-3">
+                        <label class="form-label">Summary</label>
+                        <textarea id="ticketSummary" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select id="ticketPriority" class="form-select">
+                            <option value="Low">Low</option>
+                            <option value="Average" selected>Average</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="btnSubmitTicket">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/js/support-ticket.js"></script>
 </body>
 </html>

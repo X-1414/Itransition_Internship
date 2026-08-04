@@ -11,7 +11,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddHttpClient<CV_mng_sys.Core.Services.SalesforceService>();
-
+builder.Services.AddHttpClient<CV_mng_sys.Core.Services.SupportTicketService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 

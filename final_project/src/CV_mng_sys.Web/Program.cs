@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddHttpClient<CV_mng_sys.Core.Services.SalesforceService>();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -36,7 +38,6 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         new AcceptLanguageHeaderRequestCultureProvider()
     };
 });
-
 builder.Services.AddScoped<CV_mng_sys.Core.Services.AttributeLibraryService>();
 builder.Services.AddScoped<CV_mng_sys.Core.Services.PositionService>();
 builder.Services.AddScoped<CV_mng_sys.Core.Services.CandidateProfileService>();

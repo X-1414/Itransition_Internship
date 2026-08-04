@@ -1,0 +1,49 @@
+@{
+    ViewData["Title"] = "Connect with Salesforce";
+}
+
+<h1>Connect with Salesforce</h1>
+<p class="text-muted"><strong>WEBPAGE IS UNDER CONSTRUCTION.</strong></p>
+<p class="text-muted">Share your details with our CRM to receive updates about relevant opportunities.</p>
+
+@if (ViewBag.Success == true)
+{
+    <div class="alert alert-success">
+        Successfully created in Salesforce!<br />
+        Account ID: <code>@ViewBag.AccountId</code><br />
+        Contact ID: <code>@ViewBag.ContactId</code>
+    </div>
+}
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form method="post" class="col-md-6">
+    <div class="mb-3">
+        <label class="form-label">Company Name</label>
+        <input type="text" name="companyName" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">First Name</label>
+        <input type="text" name="firstName" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Last Name</label>
+        <input type="text" name="lastName" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" value="@ViewBag.PrefilledEmail" required />
+        <div class="form-text">Pre-filled from your account - editable if needed.</div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Phone (optional)</label>
+        <input type="tel" name="phone" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Job Title (optional)</label>
+        <input type="text" name="title" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Send to Salesforce</button>
+</form>

@@ -57,3 +57,4 @@ secrets.json
 # Dependencies
 node_modules/
 vendor/
+src/CV_mng_sys.Web/certs/

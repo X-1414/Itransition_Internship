@@ -182,7 +182,8 @@ public class CvService
     public async Task<List<CvDocument>> SearchAsync(string query, bool includeAllStatuses)
     {
         if (string.IsNullOrWhiteSpace(query)) return new List<CvDocument>();
-        var candidates = _db.CvDocuments.Include(cv=>cv.CandidateUser).Include(cv=>cv.Position).Where(cv=>EF.Functions.ToTsVector("english", cv.Position.Title + " " + cv.CandidateUser.Email).Matches(EF.Functions.PlainToTsQuery("english", query)));
+        var matchingCandidates = await _db.Projects.Where(p=>p.TagsRaw!=null && p.TagsRaw.ToLower().Contains(query.ToLower())).Select(p=>p.CandidateUserId).Distinct().ToListAsync();
+        var candidates = _db.CvDocuments.Include(cv=>cv.CandidateUser).Include(cv=>cv.Position).Where(cv=>EF.Functions.ToTsVector("english", cv.Position.Title + " " + cv.CandidateUser.Email).Matches(EF.Functions.PlainToTsQuery("english", query)) || matchingCandidates.Contains(cv.CandidateUserId));
         if (!includeAllStatuses) candidates = candidates.Where(cv=>cv.Status == CvStatus.Published);
         return await candidates.ToListAsync();
     }

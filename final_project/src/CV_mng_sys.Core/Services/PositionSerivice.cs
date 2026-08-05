@@ -176,7 +176,7 @@ public class PositionService
     public async Task<List<Position>> SearchAsync(string query)
     {
         if (string.IsNullOrWhiteSpace(query)) return new List<Position>();
-        return await _db.Positions.Where(p=>EF.Functions.ToTsVector("english", p.Title+" "+(p.Description ?? "")).Matches(EF.Functions.PlainToTsQuery("english", query))).ToListAsync();
+        return await _db.Positions.Where(p=>EF.Functions.ToTsVector("english", p.Title+" "+(p.Description ?? "")).Matches(EF.Functions.PlainToTsQuery("english", query)) || (p.ProjectTagsRaw != null && p.ProjectTagsRaw.ToLower().Contains(query.ToLower()))).ToListAsync();
     }
 
     public async Task<string> GenerateApiTokenAsync(int positionId)

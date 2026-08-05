@@ -200,6 +200,7 @@
 
 @section Scripts {
     <script>window.__positionId = @Model.Id;</script>
+    <script>window.__inventoryTitle = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Title));</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
     <script src="~/js/discussion.js"></script>
     <script src="~/js/access-rules.js"></script>

@@ -22,7 +22,7 @@ document.getElementById('btnSubmitTicket')?.addEventListener('click', async () =
         return;
     }
     const body = new URLSearchParams({
-        summary, priority, returnUrl: window.location.pathname+window.location.search
+        summary, priority, returnUrl: window.location.pathname+window.location.search, inventory: window.__inventoryTitle || ''
     });
     try{
         const response = await fetch('/Support/Submit', {

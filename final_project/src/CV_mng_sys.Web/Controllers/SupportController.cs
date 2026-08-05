@@ -18,7 +18,7 @@ public class SupportController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Submit(string summary, string priority, string returnUrl)
+    public async Task<IActionResult> Submit(string summary, string priority, string returnUrl, string? inventory)
     {
         if (string.IsNullOrWhiteSpace(summary) || string.IsNullOrWhiteSpace(priority))
         {
@@ -28,7 +28,7 @@ public class SupportController : Controller
         var fullReturnURl = $"{Request.Scheme}://{Request.Host}{returnUrl}";
         var ticket = new SupportTicketRequest(
             ReportedBy: email,
-            Inventory: null,
+            Inventory: string.IsNullOrWhiteSpace(inventory) ? null : inventory,
             Link: fullReturnURl,
             Priority: priority,
             Summary: summary

@@ -115,4 +115,12 @@ public class PositionsController : Controller
         await _positions.SetAccessRulesAsync(request.PositionId, rules);
         return Ok();
     }
+
+    [Authorize(Roles = "Recruiter, Administrator")]
+    [HttpPost]
+    public async Task<IActionResult> GenerateApiToken(int id)
+    {
+        var token = await _positions.GenerateApiTokenAsync(id);
+        return Ok(new {token});
+    }
 }

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using CV_mng_sys.Core.Data;
 using CV_mng_sys.Core.Entities;
-using System.Security;
+using System.Security.Cryptography;
 
 namespace CV_mng_sys.Core.Services;
 
@@ -178,4 +178,15 @@ public class PositionService
         if (string.IsNullOrWhiteSpace(query)) return new List<Position>();
         return await _db.Positions.Where(p=>EF.Functions.ToTsVector("english", p.Title+" "+(p.Description ?? "")).Matches(EF.Functions.PlainToTsQuery("english", query))).ToListAsync();
     }
+
+    public async Task<string> GenerateApiTokenAsync(int positionId)
+    {
+        var position = await _db.Positions.FirstOrDefaultAsync(p=>p.Id == positionId);
+        if (position is null) throw new InvalidOperationException("Position not found");
+        var bytes = RandomNumberGenerator.GetBytes(32);
+        position.ApiToken = Convert.ToBase64String(bytes).Replace("+", "-").Replace("/", "_").Replace("=", "");
+        await _db.SaveChangesAsync();
+        return position.ApiToken;
+    }
+    public Task<Position?> GetByApiTokenAsync(string token) => _db.Positions.Include(p=>p.Attributes).ThenInclude(pa=>pa.AttributeDefinition).FirstOrDefaultAsync(p=>p.ApiToken==token);
 }

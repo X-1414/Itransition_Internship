@@ -172,6 +172,17 @@
                     </div>
                 </div>
             </template>
+            @if (canManage){
+                <h4 class="mt-4">Externa API (Odoo Import)</h4>
+                <p class="text-muted small">Generate a token to allow an external system (Odoo) to import this positions' aggregated data as a read-only "inventory".</p>
+                @if(!string.IsNullOrEmpty(Model.ApiToken)){
+                    <p>Current token: <code id="apiTokenValue">@Model.ApiToken</code></p>
+                    <p class="text-muted small">API endpoint: <code>@($"{Context.Request.Scheme}://{Context.Request.Host}/api/inventories/{Model.ApiToken}")</code></p>
+                }
+                <button id="btnGenerateToken" class="btn btn-sm btn-outline-secondary" data-position-id="@Model.Id">
+                    @(string.IsNullOrEmpty(Model.ApiToken) ? "Generate API Token" : "Regenerate API Token")
+                </button>
+            }
         }
     </div>
 
@@ -192,4 +203,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
     <script src="~/js/discussion.js"></script>
     <script src="~/js/access-rules.js"></script>
+    <script>
+        document.getElementById('btnGenerateToken')?.addEventListener('click', async (e) => {
+            const positionId = e.target.dataset.positionId;
+            const response = await fetch('/Positions/GenerateApiToken', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ id: positionId })
+            });
+            if (response.ok) location.reload();
+        });
+    </script>
+
 }

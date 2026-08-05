@@ -1,0 +1,52 @@
+<odoo>
+    <record id="view_inventory_list" model="ir.ui.view">
+        <field name="name">inventory.import.inventory.list</field>
+        <field name="model">inventory.import.inventory</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="title"/>
+                <field name="source_token"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_inventory_form" model="ir.ui.view">
+        <field name="name">inventory.import.inventory.form</field>
+        <field name="model">inventory.import.inventory</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_import_from_api" type="object" string="Import from API" class="btn-primary" />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="title"/>
+                        <field name="source_token"/>
+                        <field name="source_url"/>
+                    </group>
+                    <notebook>
+                        <page string="Fields &amp; Aggregates">
+                            <field name="field_ids" readonly="1">
+                                <tree>
+                                    <field name="field_title"/>
+                                    <field name="field_type"/>
+                                    <field name="average_value"/>
+                                    <field name="min_value"/>
+                                    <field name="max_value"/>
+                                    <field name="top_values"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_inventory_import" model="ir.actions.act_window">
+        <field name="name">Imported Inventories</field>
+        <field name="res_model">inventory.import.inventory</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem id="menu_inventory_import_root" name="Inventory Import" sequence="10"/>
+    <menuitem id="menu_inventory_import_list" name="Inventories" parent="menu_inventory_import_root" action="action_inventory_import"/>
+</odoo>
+        

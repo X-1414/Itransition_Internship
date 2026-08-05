@@ -19,4 +19,5 @@ public class Position
     public uint Version {get; set;}
 
     public List<string> GetProjectTags() => string.IsNullOrWhiteSpace(ProjectTagsRaw) ? new List<string>() : ProjectTagsRaw.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
+    public string? ApiToken {get; set;}
 }

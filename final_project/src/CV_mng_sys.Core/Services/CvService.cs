@@ -14,6 +14,7 @@ public record CvAttributeRow(
     uint ValueVersion 
 );
 
+public record FieldAggregate(string FieldName, string DataType, string? Average, string? Min, string? Max, List<string>? TopValues);
 public class CvService
 {
     private readonly ApplicationDbContext _db;
@@ -184,5 +185,32 @@ public class CvService
         var candidates = _db.CvDocuments.Include(cv=>cv.CandidateUser).Include(cv=>cv.Position).Where(cv=>EF.Functions.ToTsVector("english", cv.Position.Title + " " + cv.CandidateUser.Email).Matches(EF.Functions.PlainToTsQuery("english", query)));
         if (!includeAllStatuses) candidates = candidates.Where(cv=>cv.Status == CvStatus.Published);
         return await candidates.ToListAsync();
+    }
+
+    public async Task<List<FieldAggregate>> GetAggregatesForPositionAsync(int positionId)
+    {
+        var positionAttributes = await _db.PositionAttributes.Include(pa=>pa.AttributeDefinition).Where(pa=>pa.PositionId == positionId).Where(pa=>pa.PositionId == positionId).ToListAsync();
+        var candidateIds = await _db.CvDocuments.Where(cv=>cv.PositionId == positionId).Select(cv=>cv.CandidateUserId).ToListAsync();
+        var results = new List<FieldAggregate>();
+        foreach(var pa in positionAttributes)
+        {
+            var values = await _db.CandidateAttributeValues.Where(v=>candidateIds.Contains(v.CandidateUserId) && v.AttributeDefinitionId == pa.AttributeDefinitionId && v.Value!=null).Select(v=>v.Value!).ToListAsync();
+            if (pa.AttributeDefinition.DataType == AttributeDataType.Number)
+            {
+                var numbers = values.Select(v=>double.TryParse(v, out var n) ? n : (double?)null).Where(n=>n.HasValue).Select(n=>n!.Value).ToList();
+                results.Add(new FieldAggregate(pa.AttributeDefinition.Name, pa.AttributeDefinition.DataType.ToString(),
+                Average: numbers.Any() ? numbers.Average().ToString("0.00") : null,
+                Min: numbers.Any() ? numbers.Min().ToString("0.00") : null,
+                Max: numbers.Any() ? numbers.Max().ToString("0.00") : null,
+                TopValues: null));
+            }
+            else
+            {
+                var topValues = values.GroupBy(v=>v, StringComparer.OrdinalIgnoreCase).OrderByDescending(g=>g.Count()).Take(3).Select(g=>$"{g.Key} ({g.Count()})").ToList();
+                results.Add(new FieldAggregate(pa.AttributeDefinition.Name, pa.AttributeDefinition.DataType.ToString(),
+                Average: null, Min: null, Max: null, TopValues: topValues));
+            }
+        }
+        return results;
     }
 }

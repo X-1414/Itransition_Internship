@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using CV_mng_sys.Core.Entities;
 using CV_mng_sys.Core.Services;
-using AspNetCoreGeneratedDocument;
 
 namespace CV_mng_sys.Web.Controllers;
 

@@ -1,0 +1,46 @@
+﻿@page
+@model ExternalLoginModel
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<CV_mng_sys.Web.SharedResource> Localizer
+@{
+    ViewData["Title"] = Model.IsExistingAccount ? Localizer["SignIn"].Value : Localizer["Register"].Value;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model.IsExistingAccount)
+{
+    <h2 id="external-login-title">@Localizer["SignInWith"] @Model.ProviderDisplayName</h2>
+    <hr />
+    <p id="external-login-description" class="text-info">
+        @Localizer["AuthenticatedWithLinkExisting"] <strong>@Model.ProviderDisplayName</strong>.
+        @Localizer["LinkExistingAccountNote"] @Model.ProviderDisplayName @Localizer["LinkExistingAccountNoteEnd"]
+    </p>
+}
+else
+{
+    <h2 id="external-login-title">@Localizer["AssociateAccount"] @Model.ProviderDisplayName @Localizer["AccountWord"]</h2>
+    <hr />
+    <p id="external-login-description" class="text-info">
+        @Localizer["AuthenticatedWithLinkExisting"] <strong>@Model.ProviderDisplayName</strong>.
+        @Localizer["RegisterInstructions"]
+    </p>
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="@Localizer["PleaseEnterEmail"]" readonly="@Model.IsExistingAccount" />
+                <label asp-for="Input.Email" class="form-label">@Localizer["Email"]</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">@(Model.IsExistingAccount ? Localizer["SignIn"] : Localizer["Register"])</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

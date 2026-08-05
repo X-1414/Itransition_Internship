@@ -4,6 +4,7 @@ using CV_mng_sys.Core.Data;
 using CV_mng_sys.Core.Entities;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
+using AspNet.Security.OAuth.GitHub;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,6 @@ builder.Services.AddHttpClient<CV_mng_sys.Core.Services.SalesforceService>();
 builder.Services.AddHttpClient<CV_mng_sys.Core.Services.SupportTicketService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.Password.RequiredLength = 6;
@@ -24,6 +24,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         options.Password.RequireDigit = false;
         options.Lockout.AllowedForNewUsers = true;
     }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.AddAuthentication().AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+    }).AddGitHub(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:GitHub:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:GitHub:ClientSecret"]!;
+        options.Scope.Add("user:email");
+    });
 builder.Services.AddLocalization(options=>options.ResourcesPath = "Resources");
 builder.Services.AddControllersWithViews().AddViewLocalization().AddDataAnnotationsLocalization();
 builder.Services.Configure<RequestLocalizationOptions>(options =>

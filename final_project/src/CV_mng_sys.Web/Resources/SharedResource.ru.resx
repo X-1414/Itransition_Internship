@@ -218,4 +218,14 @@
   <data name="TicketSubmittedSuccess" xml:space="preserve"><value>Заявка успешно отправлена!</value></data>
   <data name="PleaseProvideSummary" xml:space="preserve"><value>Пожалуйста, укажите краткое описание.</value></data>
   <data name="CouldNotSubmitTicket" xml:space="preserve"><value>Не удалось отправить заявку.</value></data>
+  <!-- external login -->
+  <data name="SignIn" xml:space="preserve"><value>Войти</value></data>
+  <data name="SignInWith" xml:space="preserve"><value>Войти через</value></data>
+  <data name="AssociateAccount" xml:space="preserve"><value>Привязать ваш аккаунт</value></data>
+  <data name="AccountWord" xml:space="preserve"><value>.</value></data>
+  <data name="AuthenticatedWithLinkExisting" xml:space="preserve"><value>Вы успешно прошли аутентификацию через</value></data>
+  <data name="LinkExistingAccountNote" xml:space="preserve"><value>Это привяжет ваш аккаунт</value></data>
+  <data name="LinkExistingAccountNoteEnd" xml:space="preserve"><value>к вашему существующему аккаунту.</value></data>
+  <data name="RegisterInstructions" xml:space="preserve"><value>Пожалуйста, введите адрес электронной почты ниже и нажмите кнопку "Регистрация", чтобы завершить вход.</value></data>
+  <data name="PleaseEnterEmail" xml:space="preserve"><value>Пожалуйста, введите ваш email.</value></data>
 </root>

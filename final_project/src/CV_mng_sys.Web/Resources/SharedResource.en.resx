@@ -218,4 +218,14 @@
   <data name="TicketSubmittedSuccess" xml:space="preserve"><value>Ticket submitted successfully!</value></data>
   <data name="PleaseProvideSummary" xml:space="preserve"><value>Please provide a summary.</value></data>
   <data name="CouldNotSubmitTicket" xml:space="preserve"><value>Could not submit ticket.</value></data>
+  <!-- external login -->
+  <data name="SignIn" xml:space="preserve"><value>Sign In</value></data>
+  <data name="SignInWith" xml:space="preserve"><value>Sign in with</value></data>
+  <data name="AssociateAccount" xml:space="preserve"><value>Associate your</value></data>
+  <data name="AccountWord" xml:space="preserve"><value>account.</value></data>
+  <data name="AuthenticatedWithLinkExisting" xml:space="preserve"><value>You've successfully authenticated with</value></data>
+  <data name="LinkExistingAccountNote" xml:space="preserve"><value>This will link your</value></data>
+  <data name="LinkExistingAccountNoteEnd" xml:space="preserve"><value>account to your existing account below.</value></data>
+  <data name="RegisterInstructions" xml:space="preserve"><value>Please enter an email address for this site below and click the Register button to finish logging in.</value></data>
+  <data name="PleaseEnterEmail" xml:space="preserve"><value>Please enter your email.</value></data>
 </root>

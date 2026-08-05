@@ -1,15 +1,16 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<CV_mng_sys.Web.SharedResource> Localizer
 @{
-    ViewData["Title"] = "Connect with Salesforce";
+    ViewData["Title"] = Localizer["ConnectWithSalesforce"];
 }
 
-<h1>Connect with Salesforce</h1>
-<p class="text-muted"><strong>WEBPAGE IS UNDER CONSTRUCTION.</strong></p>
-<p class="text-muted">Share your details with our CRM to receive updates about relevant opportunities.</p>
+<h1>@Localizer["ConnectWithSalesforce"]</h1>
+<p class="text-muted">@Localizer["SalesforceIntro"]</p>
 
 @if (ViewBag.Success == true)
 {
     <div class="alert alert-success">
-        Successfully created in Salesforce!<br />
+        @Localizer["SuccessfullyCreatedInSalesforce"]<br />
         Account ID: <code>@ViewBag.AccountId</code><br />
         Contact ID: <code>@ViewBag.ContactId</code>
     </div>
@@ -20,37 +21,37 @@
 }
 @if (ViewBag.AlreadyConnected == true && ViewBag.Success != true){
     <div class="alert alert-info">
-        You're already connected to Salesforce.<br />
+        @Localizer["AlreadyConnectedToSalesforce"]<br />
         Account ID: <code>@ViewBag.ExistingAccountId</code><br />
         Contact ID: <code>@ViewBag.ExistingContactId</code>
-        <br /><span class="text-muted small">Submitting the form again will create a new Account/Contact and update these IDs.</span>
+        <br /><span class="text-muted small">@Localizer["SubmitAgainNote"]</span>
     </div>
 }
 <form method="post" class="col-md-6">
     <div class="mb-3">
-        <label class="form-label">Company Name</label>
+        <label class="form-label">@Localizer["CompanyName"]</label>
         <input type="text" name="companyName" class="form-control" required />
     </div>
     <div class="mb-3">
-        <label class="form-label">First Name</label>
+        <label class="form-label">@Localizer["FirstName"]</label>
         <input type="text" name="firstName" class="form-control" required />
     </div>
     <div class="mb-3">
-        <label class="form-label">Last Name</label>
+        <label class="form-label">@Localizer["LastName"]</label>
         <input type="text" name="lastName" class="form-control" required />
     </div>
     <div class="mb-3">
-        <label class="form-label">Email</label>
+        <label class="form-label">@Localizer["Email"]</label>
         <input type="email" name="email" class="form-control" value="@ViewBag.PrefilledEmail" required />
-        <div class="form-text">Pre-filled from your account - editable if needed.</div>
+        <div class="form-text">@Localizer["PrefilledEmailNote"]</div>
     </div>
     <div class="mb-3">
-        <label class="form-label">Phone (optional)</label>
+        <label class="form-label">@Localizer["Phone"]</label>
         <input type="tel" name="phone" class="form-control" />
     </div>
     <div class="mb-3">
-        <label class="form-label">Job Title (optional)</label>
+        <label class="form-label">@Localizer["JobTitle"]</label>
         <input type="text" name="title" class="form-control" />
     </div>
-    <button type="submit" class="btn btn-primary">Send to Salesforce</button>
+    <button type="submit" class="btn btn-primary">@Localizer["SendToSalesforce"]</button>
 </form>

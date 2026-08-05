@@ -6,7 +6,7 @@
 }
 
 <h1>@Localizer["MyProfile"]</h1>
-<a asp-controller="Salesforce" asp-action="Connect" class="btn btn-outline-primary btn-sm mb-3">Connect with Salesforce</a>
+<a asp-controller="Salesforce" asp-action="Connect" class="btn btn-outline-primary btn-sm mb-3">@Localizer["ConnectWithSalesforce"]</a>
 @{
     string? targetUserId = ViewBag.TargetUserId;
 }

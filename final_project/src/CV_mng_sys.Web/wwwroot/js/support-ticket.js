@@ -17,7 +17,7 @@ document.getElementById('btnSubmitTicket')?.addEventListener('click', async () =
     const successBox = document.getElementById('supportSuccess');
 
     if(!summary){
-        errorBox.textContent = 'Please provide a summary.';
+        errorBox.textContent = window.supportTexts.pleaseProvideSummary;
         errorBox.classList.remove('d-none');
         return;
     }
@@ -32,14 +32,14 @@ document.getElementById('btnSubmitTicket')?.addEventListener('click', async () =
         });
         if (!response.ok){
             const data = await response.json().catch(() => ({}));
-            errorBox.textContent = data.error || 'Could not submit ticket.';
+            errorBox.textContent = data.error || window.supportTexts.couldNotSubmitTicket;
             errorBox.classList.remove('d-none');
             return;
         }
         errorBox.classList.add('d-none');
         successBox.classList.remove('d-none');
     } catch (err){
-        errorBox.textContent = 'Network error ' + err.message;
+        errorBox.textContent = window.supportTexts.networkError + ': ' + err.message;
         errorBox.classList.remove('d-none');
     }
 });

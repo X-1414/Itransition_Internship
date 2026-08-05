@@ -194,4 +194,28 @@
   <!-- privacy -->
   <data name="PrivacyPolicy" xml:space="preserve"><value>Privacy Policy</value></data>
   <data name="UseThisPageToDetailYourSitesPrivacyPolicy" xml:space="preserve"><value>Use this page to detail your site's privacy policy.</value></data>
+  <!-- salesforce -->
+  <data name="ConnectWithSalesforce" xml:space="preserve"><value>Connect with Salesforce</value></data>
+  <data name="SalesforceIntro" xml:space="preserve"><value>Share your details with our CRM to receive updates about relevant opportunities.</value></data>
+  <data name="AlreadyConnectedToSalesforce" xml:space="preserve"><value>You're already connected to Salesforce.</value></data>
+  <data name="SubmitAgainNote" xml:space="preserve"><value>Submitting the form again will create a new Account/Contact and update these IDs.</value></data>
+  <data name="SuccessfullyCreatedInSalesforce" xml:space="preserve"><value>Successfully created in Salesforce!</value></data>
+  <data name="CompanyName" xml:space="preserve"><value>Company Name</value></data>
+  <data name="FirstName" xml:space="preserve"><value>First Name</value></data>
+  <data name="LastName" xml:space="preserve"><value>Last Name</value></data>
+  <data name="Phone" xml:space="preserve"><value>Phone (optional)</value></data>
+  <data name="JobTitle" xml:space="preserve"><value>Job Title (optional)</value></data>
+  <data name="PrefilledEmailNote" xml:space="preserve"><value>Pre-filled from your account - editable if needed.</value></data>
+  <data name="SendToSalesforce" xml:space="preserve"><value>Send to Salesforce</value></data>
+  <!-- support ticket -->
+  <data name="CreateSupportTicket" xml:space="preserve"><value>Create support ticket</value></data>
+  <data name="Summary" xml:space="preserve"><value>Summary</value></data>
+  <data name="Priority" xml:space="preserve"><value>Priority</value></data>
+  <data name="PriorityLow" xml:space="preserve"><value>Low</value></data>
+  <data name="PriorityAverage" xml:space="preserve"><value>Average</value></data>
+  <data name="PriorityHigh" xml:space="preserve"><value>High</value></data>
+  <data name="Submit" xml:space="preserve"><value>Submit</value></data>
+  <data name="TicketSubmittedSuccess" xml:space="preserve"><value>Ticket submitted successfully!</value></data>
+  <data name="PleaseProvideSummary" xml:space="preserve"><value>Please provide a summary.</value></data>
+  <data name="CouldNotSubmitTicket" xml:space="preserve"><value>Could not submit ticket.</value></data>
 </root>

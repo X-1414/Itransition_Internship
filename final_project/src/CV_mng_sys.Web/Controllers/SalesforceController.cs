@@ -20,6 +20,9 @@ public class SalesforceController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
         ViewBag.PrefilledEmail = user?.Email ?? "";
+        ViewBag.AlreadyConnected = !string.IsNullOrEmpty(user?.SalesforceAccountId);
+        ViewBag.ExistingAccountId = user?.SalesforceAccountId;
+        ViewBag.ExistingContactId = user?.SalesforceContactId;
         return View();
     }
 
@@ -39,6 +42,13 @@ public class SalesforceController : Controller
             ViewBag.Error = error;
             ViewBag.PrefilledEmail = email;
             return View();
+        }
+        var user = await _userManager.GetUserAsync(User);
+        if (user != null)
+        {
+            user.SalesforceAccountId = accountId;
+            user.SalesforceContactId = contactId;
+            await _userManager.UpdateAsync(user);
         }
         ViewBag.Success = true;
         ViewBag.AccountId = accountId;

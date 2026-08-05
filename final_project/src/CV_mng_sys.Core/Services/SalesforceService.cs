@@ -2,6 +2,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography.X509Certificates;
 
 namespace CV_mng_sys.Core.Services;
 
@@ -26,20 +29,33 @@ public class SalesforceService
         _httpClient = httpClient;
         _config = config;
     }
+
+    private string BuildSignedJwt()
+    {
+        var consumerKey = _config["Salesforce:ConsumerKey"]!;
+        var subjectUsername = _config["Salesforce:Username"]!;
+        var audience = "https://login.salesforce.com";
+        var pfxPath = Path.Combine(AppContext.BaseDirectory, "certs", "server.pfx");
+        var pfxPassword = _config["Salesforce:PfxPassword"]!;
+        var certificate = new X509Certificate2(pfxPath, pfxPassword);
+        var signingCredentials = new X509SigningCredentials(certificate, SecurityAlgorithms.RsaSha256);
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = new JwtSecurityToken(
+            issuer: consumerKey,
+            audience: audience,
+            claims: new[] { new System.Security.Claims.Claim("sub", subjectUsername) },
+            expires: DateTime.UtcNow.AddMinutes(3),
+            signingCredentials: signingCredentials
+        );
+        return tokenHandler.WriteToken(token);
+    }
     private async Task AuthenticationAsync()
     {
-        var consumerKey = _config["Salesforce:ConsumerKey"];
-        var consumerSecret = _config["Salesforce:ConsumerSecret"];
-        var username = _config["Salesforce:Username"];
-        var password = _config["Salesforce:Password"];
-        var securityToken = _config["Salesforce:SecurityToken"];
+        var jwt = BuildSignedJwt();
         var tokenRequest = new Dictionary<string, string>
         {
-            ["grant_type"] = "password",
-            ["client_id"] = consumerKey!,
-            ["client_secret"] = consumerSecret!,
-            ["username"] = username!,
-            ["password"] = password+securityToken
+            ["grant_type"] = "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            ["assertion"] = jwt
         };
         var response = await _httpClient.PostAsync("https://login.salesforce.com/services/oauth2/token", new FormUrlEncodedContent(tokenRequest));
         if (!response.IsSuccessStatusCode)

@@ -1,0 +1,60 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDEs / VS Code
+.vs/
+.vscode/
+.idea/
+*.swp
+
+# Build artifacts
+/dist/
+/build/
+/out/
+
+# Build output folders
+Debug/
+Release/
+
+# .NET artifacts
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# packages
+*.nupkg
+packages/
+*.snupkg
+*.deb
+
+# Dotnet tools
+.dotnet/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Secrets / configs
+appsettings.*.json
+appsettings.*.local.json
+appsettings.Development.json
+secrets.json
+
+# Environment files
+.env
+
+# Dependencies
+node_modules/
+vendor/
+src/CV_mng_sys.Web/certs/

@@ -5,9 +5,15 @@ using CV_mng_sys.Core.Entities;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using AspNet.Security.OAuth.GitHub;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
@@ -59,7 +65,7 @@ builder.Services.AddScoped<CV_mng_sys.Core.Services.UserManagementService>();
 builder.Services.ConfigureApplicationCookie(options =>{ options.AccessDeniedPath = "/Home/Index"; });
 
 var app = builder.Build();
-
+app.UseForwardedHeaders();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

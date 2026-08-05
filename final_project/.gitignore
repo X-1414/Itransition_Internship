@@ -57,5 +57,6 @@ secrets.json
 # Dependencies
 node_modules/
 vendor/
-src/CV_mng_sys.Web/certs/
+src/CV_mng_sys.Web/certs/server.crt
+src/CV_mng_sys.Web/certs/server.key
 src/salesforce-jwt/
